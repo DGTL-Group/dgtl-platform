@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(jq --version)",
-      "Bash(bash \"G:/Dev/dgtl-website/.claude/hooks/nas-sync.sh\")",
-      "Bash(echo \"exit=$?\")"
-    ]
-  }
-}

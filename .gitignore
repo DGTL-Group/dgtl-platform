@@ -72,6 +72,9 @@ test-results/
 .vercel
 .netlify
 
+# ── Claude Code (per-machine permission grants) ──
+.claude/settings.local.json
+
 # ── Misc ──
 .history/
 tmp/
