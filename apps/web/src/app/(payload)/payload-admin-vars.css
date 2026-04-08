@@ -1,0 +1,4 @@
+/* Payload admin CSS layer bootstrap. The real content is populated by
+   @payloadcms/next/css (imported in this group's layout.tsx). This file
+   exists as an override hook — project-specific admin UI tweaks go here. */
+@layer payload;
