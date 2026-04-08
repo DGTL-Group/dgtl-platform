@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGTL Group Holdings — Internal Project Overview</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold:        #F0CF50;
+    --gold-dim:    rgba(240,207,80,0.55);
+    --gold-pale:   rgba(240,207,80,0.08);
+    --gold-border: rgba(240,207,80,0.16);
+    --bg:          #0a0a0a;
+    --surface:     #141414;
+    --surface-2:   #1c1c1c;
+    --surface-3:   #222222;
+    --line:        #1e1e1e;
+    --white:       #ffffff;
+    --off-white:   #f0f0f0;
+    --muted:       rgba(255,255,255,0.52);
+    --stone:       rgba(255,255,255,0.28);
+    --faint:       rgba(255,255,255,0.06);
+    --green:       #3db96a;
+    --blue:        #6fa6ff;
+    --purple:      #c07fff;
+    --orange:      #ff9c40;
+    --red:         #ff7070;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--bg);
+    color: var(--off-white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.5;
+  }
+
+  /* ── TOPBAR ── */
+  .agency-bar {
+    background: rgba(10,10,10,0.96);
+    border-bottom: 1px solid var(--gold-border);
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .agency-bar-inner {
+    max-width: 1020px; margin: 0 auto;
+    padding: 13px 36px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .dgtl-logo-link { display: flex; align-items: center; text-decoration: none; }
+  .dgtl-main-logo { height: 24px; width: auto; }
+  .agency-bar-right { display: flex; align-items: center; gap: 20px; }
+  .agency-bar-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--stone);
+  }
+  .internal-badge {
+    background: var(--gold-pale);
+    border: 1px solid var(--gold-border);
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 2px;
+  }
+
+  /* ── CONTAINER ── */
+  .container {
+    max-width: 1020px; margin: 0 auto;
+    padding: 0 36px;
+    position: relative; z-index: 1;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 64px 0 52px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  .header-eyebrow {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 30px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--stone);
+  }
+  .header-eyebrow::before {
+    content: ''; display: block;
+    width: 30px; height: 2px; background: var(--gold);
+  }
+  .header-badge {
+    background: var(--gold); color: var(--bg);
+    padding: 3px 10px; border-radius: 2px;
+    font-size: 9px; letter-spacing: 0.14em; font-weight: 700;
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 5.5vw, 60px); font-weight: 900;
+    line-height: 1.03; color: var(--white); margin-bottom: 20px;
+  }
+  h1 em { font-style: italic; color: var(--gold); }
+  .header-subtitle {
+    font-size: 15px; color: var(--muted);
+    max-width: 640px; line-height: 1.82; margin-bottom: 44px;
+  }
+  .header-subtitle strong { color: var(--off-white); font-weight: 500; }
+
+  /* ── MODULE PILLS ── */
+  .scope-pills {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px;
+  }
+  .scope-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 13px; border-radius: 20px;
+    font-size: 11.5px; font-weight: 500; letter-spacing: 0.02em;
+    border: 1px solid;
+  }
+  .pill-site   { background: rgba(111,166,255,0.08); border-color: rgba(111,166,255,0.2); color: var(--blue); }
+  .pill-dash   { background: rgba(192,127,255,0.08); border-color: rgba(192,127,255,0.2); color: var(--purple); }
+  .pill-infra  { background: rgba(240,207,80,0.08); border-color: rgba(240,207,80,0.2); color: var(--gold); }
+
+  /* ── STATS ── */
+  .header-stats {
+    display: grid; grid-template-columns: repeat(5,1fr);
+    gap: 1px; background: var(--line);
+    border: 1px solid var(--line); border-radius: 4px; overflow: hidden;
+  }
+  .stat { background: var(--surface); padding: 20px 16px; text-align: center; }
+  .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 700;
+    color: var(--gold); line-height: 1; margin-bottom: 6px;
+  }
+  .stat-label {
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--stone); font-weight: 500;
+  }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 22px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--line);
+  }
+
+  /* ── STREAM TABS ── */
+  .streams-section { padding: 52px 0 44px; border-bottom: 1px solid var(--line); }
+  .streams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .stream-card {
+    background: var(--surface);
+    border: 1px solid var(--line); border-radius: 6px;
+    padding: 24px 26px; position: relative; overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .stream-card:hover {
+    border-color: var(--gold-border);
+    box-shadow: 0 6px 28px rgba(240,207,80,0.05);
+  }
+  .stream-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+  }
+  .stream-site::before { background: linear-gradient(90deg, var(--blue), transparent); }
+  .stream-dash::before { background: linear-gradient(90deg, var(--purple), transparent); }
+  .stream-tag {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    margin-bottom: 10px; font-weight: 500;
+  }
+  .stream-site .stream-tag { color: var(--blue); }
+  .stream-dash .stream-tag { color: var(--purple); }
+  .stream-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 700; color: var(--white);
+    margin-bottom: 10px; line-height: 1.2;
+  }
+  .stream-desc { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 16px; }
+  .stream-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stream-chip {
+    font-size: 11px; padding: 3px 10px; border-radius: 3px;
+    background: var(--faint); color: rgba(255,255,255,0.6);
+    font-family: 'DM Mono', monospace; letter-spacing: 0.04em;
+  }
+
+  /* ── TECH STACK ── */
+  .stack-section { padding: 48px 0 44px; border-bottom: 1px solid var(--line); }
+  .stack-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+  .stack-item {
+    background: var(--surface);
+    border: 1px solid var(--line); border-radius: 4px;
+    padding: 15px 17px;
+    display: flex; align-items: flex-start; gap: 11px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .stack-item:hover { border-color: var(--gold-border); background: var(--surface-2); }
+  .stack-icon {
+    width: 30px; height: 30px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0; margin-top: 1px;
+  }
+  .si-g  { background: rgba(61,185,106,0.12); }
+  .si-y  { background: var(--gold-pale); }
+  .si-b  { background: rgba(111,166,255,0.10); }
+  .si-o  { background: rgba(255,156,64,0.10); }
+  .si-p  { background: rgba(192,127,255,0.10); }
+  .si-r  { background: rgba(255,112,112,0.10); }
+  .stack-name { font-size: 12.5px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+  .stack-desc { font-size: 11.5px; color: var(--stone); line-height: 1.5; }
+  .stack-cost { font-family: 'DM Mono', monospace; font-size: 9.5px; font-weight: 500; margin-top: 4px; }
+  .cost-free   { color: var(--green); }
+  .cost-exist  { color: var(--gold-dim); }
+  .cost-new    { color: var(--gold); display: flex; align-items: center; gap: 4px; }
+  .cost-new::before { content: '✦'; font-size: 8px; }
+
+  /* ── DASHBOARD MODULES ── */
+  .modules-section { padding: 48px 0 44px; border-bottom: 1px solid var(--line); }
+  .modules-intro { font-size: 13.5px; color: var(--muted); max-width: 680px; line-height: 1.78; margin-bottom: 28px; }
+  .modules-v-grid { display: flex; flex-direction: column; gap: 12px; }
+  .version-block {}
+  .version-label {
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--stone); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .version-label::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+  .modules-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; }
+  .module-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
+    padding: 14px 16px; position: relative; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .module-card:hover { border-color: var(--gold-border); }
+  .module-icon { font-size: 18px; margin-bottom: 8px; }
+  .module-name { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+  .module-desc { font-size: 11.5px; color: var(--stone); line-height: 1.5; }
+  .module-v-badge {
+    position: absolute; top: 10px; right: 12px;
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 0.1em; padding: 2px 7px; border-radius: 2px;
+  }
+  .mv1 { background: rgba(61,185,106,0.1); color: var(--green); border: 1px solid rgba(61,185,106,0.2); }
+  .mv2 { background: rgba(111,166,255,0.1); color: var(--blue); border: 1px solid rgba(111,166,255,0.2); }
+  .mv3 { background: rgba(192,127,255,0.1); color: var(--purple); border: 1px solid rgba(192,127,255,0.2); }
+
+  /* ── GANTT ── */
+  .gantt-section { padding: 48px 0 44px; border-top: 1px solid var(--line); }
+  .gantt-grid {
+    display: grid; grid-template-columns: 200px 1fr;
+    border: 1px solid var(--line); border-radius: 6px; overflow: hidden;
+  }
+  .gantt-label-col { background: var(--surface-3); }
+  .gantt-label-header {
+    padding: 11px 14px;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    border-bottom: 1px solid var(--line); color: var(--stone);
+  }
+  .gantt-label-row {
+    padding: 10px 14px; font-size: 11.5px; font-weight: 400;
+    border-bottom: 1px solid var(--line);
+    color: rgba(255,255,255,0.68);
+    display: flex; align-items: center; gap: 7px;
+  }
+  .gantt-label-row:last-child { border-bottom: none; }
+  .gantt-chart-col { background: var(--surface); }
+  .gantt-weeks-header {
+    display: grid; grid-template-columns: repeat(20,1fr);
+    border-bottom: 1px solid var(--line);
+  }
+  .gantt-wk {
+    padding: 11px 0; text-align: center;
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 0.04em; color: var(--stone);
+    border-right: 1px solid var(--line);
+  }
+  .gantt-wk:last-child { border-right: none; }
+  .gantt-row {
+    display: grid; grid-template-columns: repeat(20,1fr);
+    border-bottom: 1px solid var(--line);
+    height: 40px; position: relative; align-items: center;
+  }
+  .gantt-row:last-child { border-bottom: none; }
+  .gantt-cell { height: 100%; border-right: 1px solid rgba(255,255,255,0.025); }
+  .gantt-cell:last-child { border-right: none; }
+  .gantt-bar {
+    position: absolute; height: 20px;
+    top: 50%; transform: translateY(-50%);
+    border-radius: 3px;
+    display: flex; align-items: center; padding: 0 9px;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.04em; white-space: nowrap; overflow: hidden;
+  }
+
+  /* ── TIMELINE PHASES ── */
+  .timeline-section { padding: 52px 0; }
+  .timeline-header { margin-bottom: 36px; }
+  .timeline-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; font-weight: 700; color: var(--white); margin-bottom: 6px;
+  }
+  .timeline-header p { color: var(--muted); font-size: 14px; }
+  .phases { display: flex; flex-direction: column; }
+
+  .phase {
+    display: grid; grid-template-columns: 200px 1fr;
+    position: relative;
+    opacity: 0; transform: translateY(12px);
+    animation: fadeUp 0.45s ease forwards;
+  }
+  .phase:nth-child(1){animation-delay:0.05s}
+  .phase:nth-child(2){animation-delay:0.12s}
+  .phase:nth-child(3){animation-delay:0.19s}
+  .phase:nth-child(4){animation-delay:0.26s}
+  .phase:nth-child(5){animation-delay:0.33s}
+  .phase:nth-child(6){animation-delay:0.40s}
+  .phase:nth-child(7){animation-delay:0.47s}
+  .phase:nth-child(8){animation-delay:0.54s}
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+
+  .phase-meta {
+    padding: 0 28px 0 0;
+    display: flex; flex-direction: column; align-items: flex-end;
+    position: relative;
+  }
+  .phase-meta::after {
+    content: ''; position: absolute;
+    right: -1px; top: 26px; bottom: 0; width: 2px;
+    background: linear-gradient(to bottom, var(--gold), rgba(240,207,80,0.04));
+  }
+  .phase:last-child .phase-meta::after { display: none; }
+  .phase-week {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--stone); text-align: right;
+    padding-top: 22px; line-height: 1.5;
+  }
+  .phase-stream-tag {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    margin-top: 4px; text-align: right;
+  }
+  .phase-dot {
+    position: absolute; right: -7px; top: 20px;
+    width: 13px; height: 13px; border-radius: 50%;
+    border: 2px solid var(--gold);
+    background: var(--bg); z-index: 2;
+    transition: background 0.2s;
+  }
+  .phase:hover .phase-dot { background: var(--gold); }
+
+  .phase-content { padding: 0 0 36px 32px; }
+  .phase-card {
+    background: var(--surface);
+    border: 1px solid var(--line); border-radius: 6px;
+    overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .phase-card:hover {
+    border-color: var(--gold-border);
+    box-shadow: 0 8px 32px rgba(240,207,80,0.055);
+    transform: translateY(-2px);
+  }
+  .phase-card-header {
+    padding: 18px 22px 14px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .phase-number {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.16em; color: var(--gold);
+    margin-bottom: 5px; text-transform: uppercase;
+  }
+  .phase-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 700; color: var(--white); line-height: 1.2;
+  }
+  .phase-badge {
+    flex-shrink: 0; padding: 3px 11px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+    white-space: nowrap; margin-top: 2px;
+  }
+  .b-align   { background: rgba(111,166,255,0.14); color: var(--blue); }
+  .b-design  { background: rgba(192,127,255,0.14); color: var(--purple); }
+  .b-dev     { background: rgba(61,185,106,0.14);  color: var(--green); }
+  .b-dash    { background: rgba(192,127,255,0.14); color: var(--purple); }
+  .b-infra   { background: rgba(240,207,80,0.14);  color: var(--gold); }
+  .b-qa      { background: rgba(255,112,112,0.14); color: var(--red); }
+  .b-launch  { background: var(--gold-pale); color: var(--gold); border: 1px solid var(--gold-border); }
+  .b-content { background: rgba(255,156,64,0.14);  color: var(--orange); }
+
+  .phase-card-body { padding: 18px 22px; }
+  .phase-desc {
+    font-size: 13.5px; color: var(--muted);
+    margin-bottom: 16px; line-height: 1.78;
+  }
+  .tasks { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+  .task {
+    display: flex; align-items: flex-start; gap: 9px;
+    font-size: 12.5px; color: rgba(255,255,255,0.72); line-height: 1.45;
+  }
+  .tdot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0; margin-top: 6px;
+  }
+  .phase-card-footer {
+    padding: 12px 22px; background: var(--surface-2);
+    border-top: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  }
+  .dlabel { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--stone); font-weight: 500; }
+  .dvalue { font-size: 12.5px; color: var(--off-white); font-weight: 500; }
+  .milestone {
+    display: flex; align-items: center; gap: 5px;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    color: var(--green); font-weight: 500; white-space: nowrap;
+  }
+  .milestone::before { content: '✦'; color: var(--gold); }
+
+  /* ── ROLES TABLE ── */
+  .roles-section { padding: 44px 0; border-top: 1px solid var(--line); }
+  .roles-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+  .role-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
+    padding: 18px 20px;
+  }
+  .role-icon { font-size: 20px; margin-bottom: 10px; }
+  .role-name { font-size: 13.5px; font-weight: 600; color: var(--white); margin-bottom: 5px; }
+  .role-desc { font-size: 12px; color: var(--stone); line-height: 1.6; }
+  .role-perms { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+  .role-perm {
+    font-size: 11.5px; color: rgba(255,255,255,0.65);
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .role-perm::before { content: '→'; color: var(--gold); font-size: 10px; flex-shrink: 0; }
+
+  /* ── INTEGRATIONS ── */
+  .integrations-section { padding: 44px 0; border-top: 1px solid var(--line); }
+  .int-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+  .int-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
+    padding: 16px 18px;
+    display: flex; align-items: flex-start; gap: 14px;
+  }
+  .int-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+  .int-name { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+  .int-desc { font-size: 12px; color: var(--stone); line-height: 1.55; }
+  .int-badge {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-top: 5px; display: inline-block;
+  }
+  .ib-new  { color: var(--gold); }
+  .ib-self { color: var(--green); }
+  .ib-ext  { color: var(--blue); }
+
+  /* ── COST TABLE ── */
+  .cost-section { border-top: 1px solid var(--line); padding: 44px 0; }
+  .cost-table {
+    width: 100%; border-collapse: collapse;
+    border: 1px solid var(--line); border-radius: 6px; overflow: hidden; font-size: 13px;
+  }
+  .cost-table th {
+    background: var(--surface-3); color: var(--stone);
+    padding: 12px 18px; text-align: left;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.15em; text-transform: uppercase; font-weight: 400;
+    border-bottom: 1px solid var(--line);
+  }
+  .cost-table td {
+    padding: 12px 18px; border-bottom: 1px solid var(--line);
+    color: var(--off-white); vertical-align: top;
+  }
+  .cost-table tr:last-child td { border-bottom: none; }
+  .cost-table tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+  .cost-table strong { color: var(--white); }
+  .cfree   { color: var(--gold); font-weight: 600; font-family: 'DM Mono', monospace; font-size: 11px; }
+  .cnote   { font-size: 11.5px; color: var(--stone); margin-top: 2px; }
+  .ctotal  { background: var(--gold-pale) !important; }
+  .ctotal td { border-top: 1px solid var(--gold-border) !important; }
+
+  /* ── FOOTER BLOCKS ── */
+  .footer-section {
+    border-top: 1px solid var(--line); padding: 44px 0 56px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 44px;
+  }
+  .footer-block h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 700; margin-bottom: 14px; color: var(--white);
+  }
+  .footer-block li { font-size: 13px; color: var(--muted); line-height: 1.75; }
+  .footer-block ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .footer-block li::before { content: '→ '; color: var(--gold); font-weight: 600; }
+
+  /* ── DOC FOOTER ── */
+  .doc-footer {
+    background: rgba(10,10,10,0.97);
+    border-top: 2px solid var(--gold-border);
+  }
+  .doc-footer-inner {
+    max-width: 1020px; margin: 0 auto;
+    padding: 14px 36px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .doc-footer-logo { display: flex; align-items: center; }
+  .doc-footer-logo svg { height: 24px; width: auto; }
+  .doc-footer-meta {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.14em; color: var(--stone); text-transform: uppercase;
+  }
+
+  @media (max-width: 800px) {
+    .header-stats { grid-template-columns: repeat(3,1fr); }
+    .stack-grid { grid-template-columns: repeat(2,1fr); }
+    .streams-grid { grid-template-columns: 1fr; }
+    .modules-grid { grid-template-columns: repeat(2,1fr); }
+    .tasks { grid-template-columns: 1fr; }
+    .phase { grid-template-columns: 100px 1fr; }
+    .footer-section { grid-template-columns: 1fr; }
+    .gantt-section { display: none; }
+    .int-grid { grid-template-columns: 1fr; }
+    .roles-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<div class="agency-bar">
+  <div class="agency-bar-inner">
+    <a class="dgtl-logo-link" href="https://dgtlgroup.io" target="_blank">
+      <svg class="dgtl-main-logo" viewBox="0 0 1133 744" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M221.797 286.332H138.578L93.3214 455.354H176.532C211.656 455.354 243.005 442.391 265.166 421.412C287.089 400.433 299.108 371.906 299.108 344.568C299.108 309.674 275.537 286.332 221.797 286.332ZM242.3 394.296C228.861 409.852 207.176 418.105 183.842 418.105H143.295L168.754 322.875H209.301C242.3 322.875 257.388 332.302 257.388 353.519C257.388 368.607 251.727 383.687 242.3 394.296Z" fill="white"/>
+        <path d="M379.743 394.066H436.79L432.072 411.509C424.294 416.456 412.98 421.88 390.581 421.88C355.22 421.88 339.196 410.804 339.196 388.643C339.196 369.551 348.156 350.689 361.825 338.669C374.558 327.593 391.763 320.988 411.799 320.988C445.035 320.988 459.418 329.004 466.72 339.612L496.658 312.505C484.868 295.529 463.66 283.51 425.229 283.51C387.045 283.51 356.163 295.062 334.003 315.335C311.136 336.552 297.23 368.14 297.23 397.84C297.23 440.037 331.41 459.367 378.791 459.367C401.896 459.367 444.797 452.056 468.131 427.541L486.279 359.886H388.932L379.743 394.066Z" fill="white"/>
+        <path d="M660.921 322.875L670.824 286.332H508.882L498.979 322.875H559.8L524.438 455.354H564.747L600.109 322.875H660.921Z" fill="white"/>
+        <path d="M716.191 286.332H676.111L630.855 455.354H769.93L779.833 418.105H680.829L716.191 286.332Z" fill="white"/>
+        <path d="M1039.67 371.642V371.583C1039.67 371.515 1039.66 371.447 1039.66 371.387C1039.65 371.243 1039.65 371.098 1039.63 370.962C1039.3 363.626 1033.27 357.778 1025.85 357.778H945.286C937.661 357.778 931.473 363.958 931.473 371.591V372.178C931.473 379.803 937.652 385.991 945.286 385.991H991.486L858.641 516.6L973.771 183.638C975.717 178.019 973.805 172.009 969.461 168.448C969.376 168.363 969.308 168.269 969.223 168.176C963.757 162.617 954.832 162.549 949.272 168.006L752.513 361.476C749.529 364.408 748.144 368.344 748.331 372.22C748.331 372.246 748.331 372.28 748.331 372.305V372.892C748.331 380.517 754.511 386.705 762.144 386.705H843.451C851.075 386.705 857.264 380.525 857.264 372.892V372.305C857.264 364.68 851.084 358.492 843.451 358.492H795.797L928.625 227.891L813.461 560.93C810.97 568.138 814.796 576.001 822.004 578.5L822.556 578.696C822.573 578.704 822.599 578.704 822.616 578.713C827.801 581.135 834.151 580.251 838.469 576.001L1035.47 382.31C1038.44 379.386 1039.83 375.493 1039.67 371.642Z" fill="#F0CF50"/>
+      </svg>
+    </a>
+    <div class="agency-bar-right">
+      <span class="internal-badge">Internal</span>
+      <span class="agency-bar-meta">DGTL Group Holdings — April 2026</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ── HEADER ── -->
+  <header>
+    <div class="header-eyebrow">
+      <span>Project Overview</span>
+      <span class="header-badge">INTERNAL</span>
+      <span>DGTL Group Holdings Ltd.</span>
+    </div>
+    <h1>Platform<br><em>Rebuild & Dashboard</em></h1>
+    <p class="header-subtitle">
+      A full migration of <strong>dgtlgroup.io from WordPress to Next.js 15 + Payload CMS v3</strong>, paired with the greenfield build of a
+      <strong>client dashboard at dashboard.dgtlgroup.io</strong> — giving DGTL's clients a single authenticated portal
+      for files, invoices, tasks, announcements, and work requests. Both products run as a co-located monorepo
+      on Hostinger, powered by a self-hosted PostgreSQL on the VPS and Cloudinary for media.
+      Frappe ERPNext serves as the financial and project backbone.
+    </p>
+
+    <div class="scope-pills">
+      <span class="scope-pill pill-site">⚛ dgtlgroup.io Rebuild</span>
+      <span class="scope-pill pill-dash">⬡ Client Dashboard</span>
+      <span class="scope-pill pill-infra">⚙ ERPNext Integration</span>
+      <span class="scope-pill pill-site">🖼 Cloudinary Media CDN</span>
+      <span class="scope-pill pill-dash">🔒 Owner + Admin + Team + Client Roles</span>
+      <span class="scope-pill pill-infra">🤖 Dijital on Hermes Agent</span>
+      <span class="scope-pill pill-infra">🔄 Gitea + GitHub CI/CD</span>
+    </div>
+
+    <div class="header-stats">
+      <div class="stat">
+        <div class="stat-value">2</div>
+        <div class="stat-label">Delivery Streams</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">8</div>
+        <div class="stat-label">Project Phases</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">8</div>
+        <div class="stat-label">Site Pages</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">4</div>
+        <div class="stat-label">Dashboard Roles</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">$0</div>
+        <div class="stat-label">New Monthly Fees</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── TWO STREAMS ── -->
+  <section class="streams-section">
+    <div class="section-label">Delivery Streams</div>
+    <div class="streams-grid">
+
+      <div class="stream-card stream-site">
+        <div class="stream-tag">Stream A</div>
+        <div class="stream-title">dgtlgroup.io<br>Website Rebuild</div>
+        <div class="stream-desc">
+          Migrate the existing WordPress site to a modern Next.js 15 + Payload CMS monorepo.
+          Same structure and content architecture as today, with a light visual refresh — sharper
+          typography, tighter layout, cleaner component library. Payload CMS gives full admin control
+          over pages, blog posts, case studies, team, and media without touching code.
+        </div>
+        <div class="stream-meta">
+          <span class="stream-chip">7+ pages</span>
+          <span class="stream-chip">Light visual refresh</span>
+          <span class="stream-chip">Payload admin</span>
+          <span class="stream-chip">Blog + Case Studies</span>
+          <span class="stream-chip">SEO-first SSR</span>
+        </div>
+      </div>
+
+      <div class="stream-card stream-dash">
+        <div class="stream-tag">Stream B</div>
+        <div class="stream-title">Client Dashboard<br>dashboard.dgtlgroup.io</div>
+        <div class="stream-desc">
+          A private, role-gated client portal built inside the same Next.js monorepo. Clients log in
+          and see their own files, invoices pulled from Frappe ERPNext, tasks from Frappe Projects,
+          agency announcements, and a work request form. Rolled out progressively across three
+          versions — core access in v1, richer project tooling in v2, and reporting in v3.
+        </div>
+        <div class="stream-meta">
+          <span class="stream-chip">3 user roles</span>
+          <span class="stream-chip">Per-client module toggle</span>
+          <span class="stream-chip">Frappe ERPNext API</span>
+          <span class="stream-chip">Work request form</span>
+          <span class="stream-chip">v1 → v2 → v3 roadmap</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── TECH STACK ── -->
+  <section class="stack-section">
+    <div class="section-label">Technology Stack</div>
+    <div class="stack-grid">
+
+      <div class="stack-item">
+        <div class="stack-icon si-g">⚛</div>
+        <div>
+          <div class="stack-name">Next.js 15 + React</div>
+          <div class="stack-desc">App Router, Server Components, Server Actions — SSR + SEO optimised</div>
+          <div class="stack-cost cost-free">FREE — MIT Licence</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-icon si-y">🗂</div>
+        <div>
+          <div class="stack-name">Payload CMS v3</div>
+          <div class="stack-desc">Co-located headless CMS monorepo — full admin panel, typed collections</div>
+          <div class="stack-cost cost-free">FREE — MIT Licence</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-icon si-b">🗄</div>
+        <div>
+          <div class="stack-name">PostgreSQL (Docker VPS)</div>
+          <div class="stack-desc">Self-hosted on Hostinger VPS — same Docker network as ERPNext</div>
+          <div class="stack-cost cost-free">SELF-HOSTED — no additional cost</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-icon si-g">☁</div>
+        <div>
+          <div class="stack-name">Cloudinary</div>
+          <div class="stack-desc">Image CDN, optimisation, and media storage for both site and dashboard files</div>
+          <div class="stack-cost cost-free">FREE — 25 GB free tier</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-icon si-o">🎨</div>
+        <div>
+          <div class="stack-name">Tailwind CSS v4</div>
+          <div class="stack-desc">Utility-first styling — consistent, responsive, zero runtime overhead</div>
+          <div class="stack-cost cost-free">FREE — MIT Licence</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-icon si-p">🔒</div>
+        <div>
+          <div class="stack-name">Payload Auth (Built-in)</div>
+          <div class="stack-desc">JWT-based session auth via Payload — email/password login for dashboard users</div>
+          <div class="stack-cost cost-free">FREE — included in Payload</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-icon si-r">🦎</div>
+        <div>
+          <div class="stack-name">Frappe ERPNext</div>
+          <div class="stack-desc">Self-hosted ERP — invoices, project tasks, and work request routing via REST API</div>
+          <div class="stack-cost cost-free">SELF-HOSTED — Docker VPS</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-icon si-b">🏠</div>
+        <div>
+          <div class="stack-name">Hostinger Business</div>
+          <div class="stack-desc">Managed Node.js webapp — single app slot for the Next.js + Payload monorepo</div>
+          <div class="stack-cost cost-exist">INCLUDED — existing plan</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-icon si-g">🔁</div>
+        <div>
+          <div class="stack-name">Gitea + GitHub CI/CD</div>
+          <div class="stack-desc">Gitea (git.dgtlgroup.io) as primary repo; GitHub mirror triggers Hostinger autodeploy</div>
+          <div class="stack-cost cost-free">FREE — both services</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-icon si-o">⚙️</div>
+        <div>
+          <div class="stack-name">n8n (flow.dgtlgroup.io)</div>
+          <div class="stack-desc">Automation layer — ERPNext webhooks, Dijital alerts, form routing, data sync</div>
+          <div class="stack-cost cost-exist">SELF-HOSTED — existing instance</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-icon si-y">✉</div>
+        <div>
+          <div class="stack-name">AWS SES</div>
+          <div class="stack-desc">Transactional email — dashboard auth emails, form confirmations, notifications</div>
+          <div class="stack-cost cost-exist">EXISTING — negligible cost at volume</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-icon si-p">🤖</div>
+        <div>
+          <div class="stack-name">Dijital (Hermes Agent)</div>
+          <div class="stack-desc">Work request submissions trigger a WhatsApp summary to Will via Dijital + n8n. Migrated from OpenClaw via <code style="font-size:10px;color:var(--gold);">hermes claw migrate</code>.</div>
+          <div class="stack-cost cost-exist">SELF-HOSTED — migrated from OpenClaw</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── DASHBOARD MODULE ROADMAP ── -->
+  <section class="modules-section">
+    <div class="section-label">Dashboard Module Roadmap</div>
+    <p class="modules-intro">
+      The client dashboard rolls out in three progressive versions. <strong>v1 is the full core access layer</strong> — every client can see their files, invoices, tasks, and announcements from day one, and submit work requests.
+      v2 adds richer project tooling and a project tracker. v3 brings reporting and analytics.
+      Admin can toggle any module on or off per client from the Payload admin panel.
+    </p>
+
+    <div class="modules-v-grid">
+
+      <div class="version-block">
+        <div class="version-label">v1 — Core Access (Launch)</div>
+        <div class="modules-grid">
+
+          <div class="module-card">
+            <div class="module-v-badge mv1">v1</div>
+            <div class="module-icon">📁</div>
+            <div class="module-name">File Library</div>
+            <div class="module-desc">Per-client file storage — brand assets, deliverables, shared docs. Uploaded via Payload admin, served from Cloudinary.</div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-v-badge mv1">v1</div>
+            <div class="module-icon">🧾</div>
+            <div class="module-name">Invoices</div>
+            <div class="module-desc">Live invoice feed pulled from Frappe ERPNext via REST API. Clients see status, amounts, and due dates for their account only.</div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-v-badge mv1">v1</div>
+            <div class="module-icon">✅</div>
+            <div class="module-name">Tasks</div>
+            <div class="module-desc">Tasks assigned to or from the client, pulled from Frappe Projects. Read-only view — status, due date, assignee.</div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-v-badge mv1">v1</div>
+            <div class="module-icon">📣</div>
+            <div class="module-name">Announcements</div>
+            <div class="module-desc">Agency-wide or per-client notices managed in Payload CMS. Updates, maintenance windows, team intros, etc.</div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-v-badge mv1">v1</div>
+            <div class="module-icon">📝</div>
+            <div class="module-name">Work Request Form</div>
+            <div class="module-desc">Structured form built in Next.js + Payload. Submissions route to Frappe as a new task/project, and trigger a Dijital WhatsApp summary to Will.</div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-v-badge mv1">v1</div>
+            <div class="module-icon">⚙️</div>
+            <div class="module-name">Client Info Panel</div>
+            <div class="module-desc">Key account info — service retainer, primary contacts, onboarding date, active services. Managed in Payload admin.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="version-block" style="margin-top:20px;">
+        <div class="version-label">v2 — Project Tooling</div>
+        <div class="modules-grid">
+
+          <div class="module-card">
+            <div class="module-v-badge mv2">v2</div>
+            <div class="module-icon">📊</div>
+            <div class="module-name">Project Tracker</div>
+            <div class="module-desc">Visual project progress board — milestones, phases, and completion status synced from Frappe Projects.</div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-v-badge mv2">v2</div>
+            <div class="module-icon">💬</div>
+            <div class="module-name">Request History</div>
+            <div class="module-desc">Full log of past work requests with status updates from Frappe — submitted, in progress, completed.</div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-v-badge mv2">v2</div>
+            <div class="module-icon">📅</div>
+            <div class="module-name">Shared Calendar</div>
+            <div class="module-desc">Key dates — delivery milestones, review checkpoints, scheduled calls — pulled from Frappe or Payload CMS.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="version-block" style="margin-top:20px;">
+        <div class="version-label">v3 — Reporting & Analytics</div>
+        <div class="modules-grid">
+
+          <div class="module-card">
+            <div class="module-v-badge mv3">v3</div>
+            <div class="module-icon">📈</div>
+            <div class="module-name">Social Reporting</div>
+            <div class="module-desc">Monthly performance snapshots — reach, engagement, paid ad results. Uploaded as reports or via API integration.</div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-v-badge mv3">v3</div>
+            <div class="module-icon">🔍</div>
+            <div class="module-name">Site Analytics</div>
+            <div class="module-desc">Plausible analytics embed per-client site — traffic, top pages, referrers. Read-only dashboard widget.</div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-v-badge mv3">v3</div>
+            <div class="module-icon">💰</div>
+            <div class="module-name">Spend Summary</div>
+            <div class="module-desc">Monthly ad spend and budget overview pulled from Frappe ERPNext billing data — simplified view for the client.</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── USER ROLES ── -->
+  <section class="roles-section">
+    <div class="section-label">Dashboard Access Roles</div>
+    <p style="font-size:13.5px;color:var(--muted);max-width:680px;line-height:1.78;margin-bottom:24px;">
+      Four roles govern the dashboard. <strong style="color:var(--off-white);">Will is the Owner</strong> — a protected role that cannot be removed, demoted, or deleted by anyone, including other admins. Other users can be promoted to Admin by the Owner or any Admin, giving full platform access without the ability to touch the Owner account.
+    </p>
+    <div class="roles-grid" style="grid-template-columns:repeat(4,1fr);">
+
+      <div class="role-card" style="border-color:rgba(240,207,80,0.3);position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);"></div>
+        <div class="role-icon">👑</div>
+        <div class="role-name" style="color:var(--gold);">Owner (Will)</div>
+        <div class="role-desc">Protected role — hardcoded, cannot be removed or demoted by anyone. Survives admin actions.</div>
+        <div class="role-perms">
+          <div class="role-perm">All Admin permissions</div>
+          <div class="role-perm">Cannot be deleted or demoted</div>
+          <div class="role-perm">Can promote/demote Admins</div>
+          <div class="role-perm">Enforced at DB + middleware level</div>
+        </div>
+      </div>
+
+      <div class="role-card">
+        <div class="role-icon">🛡</div>
+        <div class="role-name">Admin</div>
+        <div class="role-desc">Assigned by Owner or another Admin. Full platform access — manages clients, users, content, and modules.</div>
+        <div class="role-perms">
+          <div class="role-perm">Create, edit, delete any content</div>
+          <div class="role-perm">Toggle modules per client</div>
+          <div class="role-perm">Promote users to Admin</div>
+          <div class="role-perm">Cannot touch Owner account</div>
+          <div class="role-perm">Full Payload CMS admin access</div>
+        </div>
+      </div>
+
+      <div class="role-card">
+        <div class="role-icon">🧑‍💼</div>
+        <div class="role-name">Team Member</div>
+        <div class="role-desc">DGTL contractors and employees. Access to assigned client accounts for task and file management.</div>
+        <div class="role-perms">
+          <div class="role-perm">View assigned client portals</div>
+          <div class="role-perm">Upload files to client library</div>
+          <div class="role-perm">View tasks — cannot close/edit</div>
+          <div class="role-perm">No billing or invoice access</div>
+          <div class="role-perm">No Payload admin access</div>
+        </div>
+      </div>
+
+      <div class="role-card">
+        <div class="role-icon">🤝</div>
+        <div class="role-name">Client</div>
+        <div class="role-desc">End client access. Sees only their own portal — modules are individually toggled by Admin per account.</div>
+        <div class="role-perms">
+          <div class="role-perm">Own files, invoices, tasks only</div>
+          <div class="role-perm">Submit work requests</div>
+          <div class="role-perm">View announcements</div>
+          <div class="role-perm">No access to other clients</div>
+          <div class="role-perm">Module visibility set by Admin</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── SITE PAGES ── -->
+  <section class="integrations-section">
+    <div class="section-label">dgtlgroup.io — Page Scope</div>
+    <div class="int-grid">
+
+      <div class="int-card">
+        <div class="int-icon">🏠</div>
+        <div>
+          <div class="int-name">Home</div>
+          <div class="int-desc">Hero, services overview, selected work, social proof, and CTA. Light visual refresh — same structure, crisper execution.</div>
+          <div class="int-badge ib-self">MIGRATE + REFRESH</div>
+        </div>
+      </div>
+
+      <div class="int-card">
+        <div class="int-icon">👋</div>
+        <div>
+          <div class="int-name">About</div>
+          <div class="int-desc">Agency story, values, and team. Payload-managed team member profiles with photos via Cloudinary.</div>
+          <div class="int-badge ib-self">MIGRATE + REFRESH</div>
+        </div>
+      </div>
+
+      <div class="int-card">
+        <div class="int-icon">⚡</div>
+        <div>
+          <div class="int-name">Services</div>
+          <div class="int-desc">Full service listing — web dev, AI automation, content, paid ads, growth strategy. Payload-managed service cards.</div>
+          <div class="int-badge ib-self">MIGRATE + REFRESH</div>
+        </div>
+      </div>
+
+      <div class="int-card">
+        <div class="int-icon">🎨</div>
+        <div>
+          <div class="int-name">Work / Portfolio</div>
+          <div class="int-desc">Selected client work with screenshots and results. CMS-managed — add new projects without touching code.</div>
+          <div class="int-badge ib-self">MIGRATE + REFRESH</div>
+        </div>
+      </div>
+
+      <div class="int-card">
+        <div class="int-icon">📧</div>
+        <div>
+          <div class="int-name">Contact</div>
+          <div class="int-desc">Enquiry form routing via n8n → Dijital → Twenty CRM. Async-first — no Cal.com embed.</div>
+          <div class="int-badge ib-self">MIGRATE + REFRESH</div>
+        </div>
+      </div>
+
+      <div class="int-card">
+        <div class="int-icon">✍️</div>
+        <div>
+          <div class="int-name">Blog / Articles</div>
+          <div class="int-desc">New section. Payload-managed editorial posts — categories, authors, featured images via Cloudinary. SEO-optimised.</div>
+          <div class="int-badge ib-new">NEW</div>
+        </div>
+      </div>
+
+      <div class="int-card">
+        <div class="int-icon">🧑‍🤝‍🧑</div>
+        <div>
+          <div class="int-name">Team / Careers</div>
+          <div class="int-desc">Team profiles and open roles. Payload-managed. Optional job board — publish roles without code changes.</div>
+          <div class="int-badge ib-new">NEW</div>
+        </div>
+      </div>
+
+      <div class="int-card">
+        <div class="int-icon">⚖️</div>
+        <div>
+          <div class="int-name">Legal / Privacy</div>
+          <div class="int-desc">Privacy policy, terms of service, cookie notice. Payload-managed plain text. Required for compliance.</div>
+          <div class="int-badge ib-new">NEW (RECOMMENDED)</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── GANTT ── -->
+  <section class="gantt-section">
+    <div class="section-label">Visual Schedule — Self-Paced, 20-Week Reference</div>
+    <div class="gantt-grid">
+      <div class="gantt-label-col">
+        <div class="gantt-label-header">Phase</div>
+        <div class="gantt-label-row">📋 Setup & Scaffold</div>
+        <div class="gantt-label-row">🎨 Design Refresh</div>
+        <div class="gantt-label-row">💻 Site Dev (Stream A)</div>
+        <div class="gantt-label-row">✍️ Content Migration</div>
+        <div class="gantt-label-row">⬡ Dashboard v1 Dev</div>
+        <div class="gantt-label-row">🔌 ERPNext Integration</div>
+        <div class="gantt-label-row">🧪 QA & Testing</div>
+        <div class="gantt-label-row">🚀 Launch</div>
+      </div>
+      <div class="gantt-chart-col">
+        <div class="gantt-weeks-header">
+          <div class="gantt-wk">W1</div><div class="gantt-wk">W2</div>
+          <div class="gantt-wk">W3</div><div class="gantt-wk">W4</div>
+          <div class="gantt-wk">W5</div><div class="gantt-wk">W6</div>
+          <div class="gantt-wk">W7</div><div class="gantt-wk">W8</div>
+          <div class="gantt-wk">W9</div><div class="gantt-wk">W10</div>
+          <div class="gantt-wk">W11</div><div class="gantt-wk">W12</div>
+          <div class="gantt-wk">W13</div><div class="gantt-wk">W14</div>
+          <div class="gantt-wk">W15</div><div class="gantt-wk">W16</div>
+          <div class="gantt-wk">W17</div><div class="gantt-wk">W18</div>
+          <div class="gantt-wk">W19</div><div class="gantt-wk">W20</div>
+        </div>
+        <!-- Setup W1-W2 -->
+        <div class="gantt-row">
+          <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+          <div class="gantt-bar" style="left:0;width:calc(2/20*100%);background:#1a3060;color:#6fa6ff;">Setup & Scaffold</div>
+        </div>
+        <!-- Design W2-W5 -->
+        <div class="gantt-row">
+          <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+          <div class="gantt-bar" style="left:calc(1/20*100%);width:calc(4/20*100%);background:#4a1a6a;color:#c07fff;">Design Refresh</div>
+        </div>
+        <!-- Site Dev W4-W10 -->
+        <div class="gantt-row">
+          <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+          <div class="gantt-bar" style="left:calc(3/20*100%);width:calc(7/20*100%);background:#1a3a22;color:#3db96a;">Site Dev (Stream A)</div>
+        </div>
+        <!-- Content W5-W11 -->
+        <div class="gantt-row">
+          <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+          <div class="gantt-bar" style="left:calc(4/20*100%);width:calc(6/20*100%);background:#5a3000;color:#ff9c40;">Content Migration</div>
+        </div>
+        <!-- Dashboard Dev W6-W14 -->
+        <div class="gantt-row">
+          <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+          <div class="gantt-bar" style="left:calc(5/20*100%);width:calc(9/20*100%);background:#3a1a5a;color:#c07fff;">Dashboard v1 Dev</div>
+        </div>
+        <!-- ERPNext W8-W15 -->
+        <div class="gantt-row">
+          <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+          <div class="gantt-bar" style="left:calc(7/20*100%);width:calc(7/20*100%);background:#3a2a10;color:#F0CF50;">ERPNext Integration</div>
+        </div>
+        <!-- QA W16-W19 -->
+        <div class="gantt-row">
+          <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+          <div class="gantt-bar" style="left:calc(15/20*100%);width:calc(3/20*100%);background:#5a1010;color:#ff7070;">QA & Testing</div>
+        </div>
+        <!-- Launch W20 -->
+        <div class="gantt-row">
+          <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+          <div class="gantt-bar" style="left:calc(19/20*100%);width:calc(1/20*100%);background:var(--gold-pale);color:var(--gold);border:1px solid var(--gold-border);">🚀</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PHASE CARDS ── -->
+  <section class="timeline-section">
+    <div class="timeline-header">
+      <div class="section-label">Project Phases</div>
+      <h2>8-Phase Breakdown</h2>
+      <p>Self-paced delivery across two parallel streams — site rebuild and dashboard — with clear outputs at every phase.</p>
+    </div>
+
+    <div class="phases">
+
+      <!-- P1 -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-week">Week 1–2</div>
+          <div class="phase-stream-tag" style="color:var(--blue);">Both streams</div>
+          <div class="phase-dot"></div>
+        </div>
+        <div class="phase-content">
+          <div class="phase-card">
+            <div class="phase-card-header">
+              <div>
+                <div class="phase-number">Phase 01</div>
+                <div class="phase-title">Project Setup & Monorepo Scaffold</div>
+              </div>
+              <span class="phase-badge b-infra">⚙ Infrastructure</span>
+            </div>
+            <div class="phase-card-body">
+              <p class="phase-desc">Everything starts here. The Next.js 15 + Payload CMS v3 monorepo is scaffolded from scratch, connected to the self-hosted PostgreSQL on the VPS, and wired into the Gitea → GitHub → Hostinger autodeploy pipeline. Both dgtlgroup.io and dashboard.dgtlgroup.io are mapped as separate Next.js apps within the monorepo. Cloudinary is configured as the default media adapter for Payload. This phase produces a working, deployed shell — no content yet, but the full infrastructure is live and CI/CD is confirmed before any build work begins.</p>
+              <div class="tasks">
+                <div class="task"><div class="tdot"></div><span>Scaffold Next.js 15 + Payload CMS v3 monorepo (pnpm workspaces)</span></div>
+                <div class="task"><div class="tdot"></div><span>Provision PostgreSQL database on Docker VPS — connect to Payload</span></div>
+                <div class="task"><div class="tdot"></div><span>Configure Cloudinary as Payload's default media adapter</span></div>
+                <div class="task"><div class="tdot"></div><span>Set up Gitea repo — push to GitHub mirror for Hostinger CI/CD</span></div>
+                <div class="task"><div class="tdot"></div><span>Define two Next.js apps in monorepo: site + dashboard subdomains</span></div>
+                <div class="task"><div class="tdot"></div><span>Deploy shell to Hostinger — confirm both subdomain routes resolve</span></div>
+                <div class="task"><div class="tdot"></div><span>Confirm AWS SES SMTP for Payload auth emails</span></div>
+                <div class="task"><div class="tdot"></div><span>Audit existing WordPress site — page inventory, media assets, URLs</span></div>
+              </div>
+            </div>
+            <div class="phase-card-footer">
+              <div>
+                <div class="dlabel">Deliverable</div>
+                <div class="dvalue">Live monorepo on Hostinger — both apps resolve, CI/CD confirmed, Payload admin accessible</div>
+              </div>
+              <div class="milestone">Foundation ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- P2 -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-week">Week 2–5</div>
+          <div class="phase-stream-tag" style="color:var(--blue);">Stream A</div>
+          <div class="phase-dot"></div>
+        </div>
+        <div class="phase-content">
+          <div class="phase-card">
+            <div class="phase-card-header">
+              <div>
+                <div class="phase-number">Phase 02</div>
+                <div class="phase-title">Design System & Visual Refresh</div>
+              </div>
+              <span class="phase-badge b-design">🎨 Design</span>
+            </div>
+            <div class="phase-card-body">
+              <p class="phase-desc">The DGTL brand is already strong — this phase sharpens it for the Next.js rebuild without changing the identity. A Tailwind design system is established with all brand tokens (gold #F0CF50, typography, spacing scale, component library). The visual refresh targets: tighter whitespace, stronger typographic hierarchy, more consistent component sizing, and better mobile layout. Each of the 7+ pages is wireframed and reviewed before any development starts. The dashboard gets its own UI design pass — dark, professional, clean.</p>
+              <div class="tasks">
+                <div class="task"><div class="tdot"></div><span>Define Tailwind design tokens — colours, type scale, spacing, shadows</span></div>
+                <div class="task"><div class="tdot"></div><span>Build shared component library — buttons, cards, nav, footer, forms</span></div>
+                <div class="task"><div class="tdot"></div><span>Wireframe all 7+ site pages — review before dev begins</span></div>
+                <div class="task"><div class="tdot"></div><span>Design dashboard UI — layout, sidebar, module cards, empty states</span></div>
+                <div class="task"><div class="tdot"></div><span>Design Payload CMS collections architecture — pages, posts, team, work</span></div>
+                <div class="task"><div class="tdot"></div><span>Map WordPress URL structure → Next.js routes for 301 redirect plan</span></div>
+                <div class="task"><div class="tdot"></div><span>Mobile-first responsive breakpoints confirmed for all layouts</span></div>
+                <div class="task"><div class="tdot"></div><span>Design sign-off before Phase 3 development begins</span></div>
+              </div>
+            </div>
+            <div class="phase-card-footer">
+              <div>
+                <div class="dlabel">Deliverable</div>
+                <div class="dvalue">Tailwind design system + all page wireframes + dashboard UI designs — approved before dev</div>
+              </div>
+              <div class="milestone">Design approved ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- P3 -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-week">Week 4–10</div>
+          <div class="phase-stream-tag" style="color:var(--blue);">Stream A</div>
+          <div class="phase-dot"></div>
+        </div>
+        <div class="phase-content">
+          <div class="phase-card">
+            <div class="phase-card-header">
+              <div>
+                <div class="phase-number">Phase 03</div>
+                <div class="phase-title">Site Development — dgtlgroup.io</div>
+              </div>
+              <span class="phase-badge b-dev">💻 Development</span>
+            </div>
+            <div class="phase-card-body">
+              <p class="phase-desc">All 7+ public-facing pages are built in Next.js 15 with Server Components, fully typed with TypeScript strict mode. Payload CMS collections are configured for each content type — pages, blog posts, case studies, team members, work/portfolio items, and the service list. The contact form is wired through n8n to Twenty CRM and Dijital. All WordPress 301 redirects are implemented. Lighthouse scores are benchmarked against the current WordPress site throughout development.</p>
+              <div class="tasks">
+                <div class="task"><div class="tdot"></div><span>Build all 7+ pages — Home, About, Services, Work, Contact, Blog, Team</span></div>
+                <div class="task"><div class="tdot"></div><span>Configure Payload collections — posts, case studies, team, portfolio, pages</span></div>
+                <div class="task"><div class="tdot"></div><span>Implement dynamic routes for blog and case study slugs</span></div>
+                <div class="task"><div class="tdot"></div><span>Contact form → n8n → Twenty CRM lead + Dijital WhatsApp alert</span></div>
+                <div class="task"><div class="tdot"></div><span>Implement 301 redirect map from WordPress URL audit</span></div>
+                <div class="task"><div class="tdot"></div><span>SEO metadata — per-page title, description, OG tags via Payload fields</span></div>
+                <div class="task"><div class="tdot"></div><span>Generate XML sitemap + robots.txt — submit to Google Search Console</span></div>
+                <div class="task"><div class="tdot"></div><span>Legal pages — Privacy Policy + Terms of Service (Payload-managed)</span></div>
+              </div>
+            </div>
+            <div class="phase-card-footer">
+              <div>
+                <div class="dlabel">Deliverable</div>
+                <div class="dvalue">All site pages live on staging — Payload admin functional, contact form wired, redirects in place</div>
+              </div>
+              <div class="milestone">Site staging ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- P4 -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-week">Week 5–11</div>
+          <div class="phase-stream-tag" style="color:var(--blue);">Stream A</div>
+          <div class="phase-dot"></div>
+        </div>
+        <div class="phase-content">
+          <div class="phase-card">
+            <div class="phase-card-header">
+              <div>
+                <div class="phase-number">Phase 04</div>
+                <div class="phase-title">Content Migration</div>
+              </div>
+              <span class="phase-badge b-content">✍️ Content</span>
+            </div>
+            <div class="phase-card-body">
+              <p class="phase-desc">All existing WordPress content — pages, blog posts, media assets — is migrated into Payload CMS collections. The WordPress XML export is parsed and content is cleaned, reformatted, and entered into the new schema. Images are uploaded to Cloudinary and referenced in Payload. New pages (Blog index, Team, Legal) receive fresh copy. The existing portfolio and work section is reviewed, updated, and expanded where appropriate. This phase runs in parallel with site development and continues until the site is ready to QA.</p>
+              <div class="tasks">
+                <div class="task"><div class="tdot"></div><span>Parse WordPress XML export — extract pages, posts, and media</span></div>
+                <div class="task"><div class="tdot"></div><span>Upload all media assets to Cloudinary — update Payload references</span></div>
+                <div class="task"><div class="tdot"></div><span>Enter all page content into Payload CMS collections</span></div>
+                <div class="task"><div class="tdot"></div><span>Write fresh copy for Blog index, Team, and Legal pages</span></div>
+                <div class="task"><div class="tdot"></div><span>Review and update portfolio/work section — remove stale entries</span></div>
+                <div class="task"><div class="tdot"></div><span>Add team member profiles with photos and bios</span></div>
+                <div class="task"><div class="tdot"></div><span>Final content review — all pages proofread before QA</span></div>
+              </div>
+            </div>
+            <div class="phase-card-footer">
+              <div>
+                <div class="dlabel">Deliverable</div>
+                <div class="dvalue">All content live in Payload CMS — staging site fully populated and ready for QA</div>
+              </div>
+              <div class="milestone">Content migrated ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- P5 -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-week">Week 6–14</div>
+          <div class="phase-stream-tag" style="color:var(--purple);">Stream B</div>
+          <div class="phase-dot"></div>
+        </div>
+        <div class="phase-content">
+          <div class="phase-card">
+            <div class="phase-card-header">
+              <div>
+                <div class="phase-number">Phase 05</div>
+                <div class="phase-title">Dashboard v1 — Core Build</div>
+              </div>
+              <span class="phase-badge b-dash">⬡ Dashboard</span>
+            </div>
+            <div class="phase-card-body">
+              <p class="phase-desc">The client dashboard is built inside the monorepo at dashboard.dgtlgroup.io. Payload's built-in JWT auth is used — email/password login for all users. Four roles are implemented: Owner (Will — hardcoded, protected, cannot be removed or demoted by any action), Admin (can be assigned by Owner or other Admins, full platform access), Team Member, and Client. Role enforcement is applied at both the middleware and Payload collection access-control level — an Admin cannot demote or delete the Owner account. All v1 modules are built: file library, invoice view, task list, announcements, work request form, and the client info panel. Each module can be independently toggled per client from the Payload admin. The work request form routes submissions to Frappe ERPNext via the REST API and triggers a Dijital (Hermes Agent) WhatsApp summary to Will via n8n.</p>
+              <div class="tasks">
+                <div class="task"><div class="tdot"></div><span>Configure Payload auth — 4 roles: owner, admin, team, client — JWT sessions + owner protection</span></div>
+                <div class="task"><div class="tdot"></div><span>Implement per-client module toggle in Payload admin</span></div>
+                <div class="task"><div class="tdot"></div><span>Build dashboard layout — sidebar nav, header, responsive shell</span></div>
+                <div class="task"><div class="tdot"></div><span>File Library module — Cloudinary upload via Payload, per-client scoped</span></div>
+                <div class="task"><div class="tdot"></div><span>Invoices module — Frappe ERPNext REST API fetch, read-only view</span></div>
+                <div class="task"><div class="tdot"></div><span>Tasks module — Frappe Projects API, filter by client, read-only</span></div>
+                <div class="task"><div class="tdot"></div><span>Announcements module — Payload collection, global + per-client</span></div>
+                <div class="task"><div class="tdot"></div><span>Work request form — POST to Frappe, n8n webhook → Dijital (Hermes Agent) WhatsApp</span></div>
+              </div>
+            </div>
+            <div class="phase-card-footer">
+              <div>
+                <div class="dlabel">Deliverable</div>
+                <div class="dvalue">Dashboard v1 live on staging — all core modules working, 4-role auth confirmed, owner protection enforced, one test client onboarded</div>
+              </div>
+              <div class="milestone">Dashboard v1 staging ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- P6 -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-week">Week 8–15</div>
+          <div class="phase-stream-tag" style="color:var(--gold);">Both streams</div>
+          <div class="phase-dot"></div>
+        </div>
+        <div class="phase-content">
+          <div class="phase-card">
+            <div class="phase-card-header">
+              <div>
+                <div class="phase-number">Phase 06</div>
+                <div class="phase-title">ERPNext Integration & API Layer</div>
+              </div>
+              <span class="phase-badge b-infra">⚙ Integration</span>
+            </div>
+            <div class="phase-card-body">
+              <p class="phase-desc">Frappe ERPNext is deployed on the VPS (Docker) and integrated with the dashboard via its REST API. API keys are provisioned per role — the dashboard reads invoices and tasks as a read-only service account. Frappe webhooks fire to n8n on invoice creation, task updates, and project status changes — triggering dashboard cache invalidation and optional WhatsApp alerts via Dijital. The work request form creates a new Frappe task/project via the API. Claude Code handles API discovery and integration testing iteratively.</p>
+              <div class="tasks">
+                <div class="task"><div class="tdot"></div><span>Deploy Frappe ERPNext on Docker VPS — configure company and accounts</span></div>
+                <div class="task"><div class="tdot"></div><span>Provision Frappe API keys — read-only dashboard service account</span></div>
+                <div class="task"><div class="tdot"></div><span>Invoice API — fetch per-client invoices, map to dashboard schema</span></div>
+                <div class="task"><div class="tdot"></div><span>Projects/Tasks API — fetch tasks filtered by client tag or project</span></div>
+                <div class="task"><div class="tdot"></div><span>Work request form → POST to Frappe task creation endpoint</span></div>
+                <div class="task"><div class="tdot"></div><span>n8n webhook listeners — invoice and task events → cache bust + alerts</span></div>
+                <div class="task"><div class="tdot"></div><span>Test full data flow — Frappe → API → dashboard with real data</span></div>
+                <div class="task"><div class="tdot"></div><span>Secure all API credentials — VPS environment variables, no hardcoding</span></div>
+              </div>
+            </div>
+            <div class="phase-card-footer">
+              <div>
+                <div class="dlabel">Deliverable</div>
+                <div class="dvalue">Frappe ERPNext live — invoices and tasks flowing into dashboard, work requests posting to Frappe</div>
+              </div>
+              <div class="milestone">ERPNext integrated ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- P7 -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-week">Week 16–19</div>
+          <div class="phase-stream-tag" style="color:var(--red);">Both streams</div>
+          <div class="phase-dot"></div>
+        </div>
+        <div class="phase-content">
+          <div class="phase-card">
+            <div class="phase-card-header">
+              <div>
+                <div class="phase-number">Phase 07</div>
+                <div class="phase-title">QA, Performance & Security</div>
+              </div>
+              <span class="phase-badge b-qa">🧪 QA</span>
+            </div>
+            <div class="phase-card-body">
+              <p class="phase-desc">Both the site and dashboard go through a thorough QA pass before launch. The site is tested against Lighthouse for Core Web Vitals — benchmarked against the current WordPress build to confirm measurable improvement. All 301 redirects are validated. Dashboard auth flows are tested across all three roles — correct data scoping is confirmed for every module. ERPNext API calls are tested with edge cases — empty states, pagination, auth errors. Security headers, SSL, and HTTPS redirects are verified on both subdomains.</p>
+              <div class="tasks">
+                <div class="task"><div class="tdot"></div><span>Full cross-browser + mobile QA — Chrome, Safari, Firefox, iOS, Android</span></div>
+                <div class="task"><div class="tdot"></div><span>Lighthouse audit — Performance, SEO, Accessibility, Best Practices</span></div>
+                <div class="task"><div class="tdot"></div><span>Benchmark Lighthouse scores vs current WordPress site</span></div>
+                <div class="task"><div class="tdot"></div><span>Validate all 301 redirects — confirm no 404s from old WordPress URLs</span></div>
+                <div class="task"><div class="tdot"></div><span>Dashboard role testing — owner protection, admin, team, client data isolation confirmed</span></div>
+                <div class="task"><div class="tdot"></div><span>ERPNext API edge case testing — empty invoices, pagination, rate limits</span></div>
+                <div class="task"><div class="tdot"></div><span>Security headers — HSTS, CSP, X-Frame-Options on both domains</span></div>
+                <div class="task"><div class="tdot"></div><span>Uptime Kuma monitors configured for both dgtlgroup.io + dashboard</span></div>
+              </div>
+            </div>
+            <div class="phase-card-footer">
+              <div>
+                <div class="dlabel">Deliverable</div>
+                <div class="dvalue">QA report — Lighthouse scores, redirect validation, role isolation confirmation, security headers</div>
+              </div>
+              <div class="milestone">QA passed ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- P8 -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-week">Week 20</div>
+          <div class="phase-stream-tag" style="color:var(--gold);">Both streams</div>
+          <div class="phase-dot"></div>
+        </div>
+        <div class="phase-content">
+          <div class="phase-card">
+            <div class="phase-card-header">
+              <div>
+                <div class="phase-number">Phase 08</div>
+                <div class="phase-title">Launch & Handover</div>
+              </div>
+              <span class="phase-badge b-launch">🚀 Go-Live</span>
+            </div>
+            <div class="phase-card-body">
+              <p class="phase-desc">Both products go live. The dgtlgroup.io DNS cutover is executed with zero-downtime — Cloudflare proxy stays active, SSL Full mode confirmed. The WordPress site is archived and kept accessible for 30 days. The dashboard is opened to the first real clients — accounts are created, modules are toggled to the correct configuration per client, and logins are distributed. Uptime Kuma monitors both domains. Google Search Console is updated with the new sitemap. A post-launch review is scheduled two weeks after go-live.</p>
+              <div class="tasks">
+                <div class="task"><div class="tdot"></div><span>DNS cutover — dgtlgroup.io to Hostinger Node.js app, Cloudflare active</span></div>
+                <div class="task"><div class="tdot"></div><span>SSL verification — Cloudflare Full mode, HTTPS redirect confirmed</span></div>
+                <div class="task"><div class="tdot"></div><span>WordPress archived — accessible at staging URL for 30 days</span></div>
+                <div class="task"><div class="tdot"></div><span>Create first client accounts in dashboard — configure module toggles</span></div>
+                <div class="task"><div class="tdot"></div><span>Distribute dashboard login credentials to clients</span></div>
+                <div class="task"><div class="tdot"></div><span>Update Google Search Console — submit new sitemap, verify ownership</span></div>
+                <div class="task"><div class="tdot"></div><span>48-hour post-launch monitoring — logs, Uptime Kuma, Plausible analytics</span></div>
+                <div class="task"><div class="tdot"></div><span>Post-launch review — 2 weeks after go-live, v2 dashboard roadmap kickoff</span></div>
+              </div>
+            </div>
+            <div class="phase-card-footer">
+              <div>
+                <div class="dlabel">Deliverable</div>
+                <div class="dvalue">Both products live — site + dashboard — first clients onboarded, monitoring active</div>
+              </div>
+              <div class="milestone">Live ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── COST TABLE ── -->
+  <section class="cost-section">
+    <div class="section-label">Infrastructure Cost Overview</div>
+    <table class="cost-table">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Purpose</th>
+          <th>Monthly Cost</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Next.js 15 + Payload CMS v3</strong></td>
+          <td>Frontend framework + headless CMS (monorepo)</td>
+          <td><div class="cfree">FREE</div></td>
+          <td><div class="cnote">Both MIT licensed — no subscription fees</div></td>
+        </tr>
+        <tr>
+          <td><strong>PostgreSQL (Docker VPS)</strong></td>
+          <td>Database for Payload CMS + dashboard data</td>
+          <td><div class="cfree">SELF-HOSTED</div></td>
+          <td><div class="cnote">Runs on existing Hostinger VPS — no additional cost</div></td>
+        </tr>
+        <tr>
+          <td><strong>Cloudinary</strong></td>
+          <td>Image CDN, media storage, file serving</td>
+          <td><div class="cfree">FREE</div></td>
+          <td><div class="cnote">25 GB free tier — ample for site + dashboard files</div></td>
+        </tr>
+        <tr>
+          <td><strong>Frappe ERPNext</strong></td>
+          <td>Invoices, project tasks, work request backend</td>
+          <td><div class="cfree">SELF-HOSTED</div></td>
+          <td><div class="cnote">Docker on existing VPS — Community Edition, fully free</div></td>
+        </tr>
+        <tr>
+          <td><strong>Hostinger Business</strong></td>
+          <td>Node.js webapp hosting for Next.js monorepo</td>
+          <td><div class="cfree">INCLUDED</div></td>
+          <td><div class="cnote">Existing plan — one app slot covers both site + dashboard</div></td>
+        </tr>
+        <tr>
+          <td><strong>Gitea + GitHub</strong></td>
+          <td>Source control (Gitea primary) + autodeploy mirror (GitHub)</td>
+          <td><div class="cfree">FREE</div></td>
+          <td><div class="cnote">Gitea self-hosted on VPS; GitHub free tier for CI/CD trigger</div></td>
+        </tr>
+        <tr>
+          <td><strong>n8n (flow.dgtlgroup.io)</strong></td>
+          <td>Automation — ERPNext webhooks, form routing, Dijital alerts</td>
+          <td><div class="cfree">SELF-HOSTED</div></td>
+          <td><div class="cnote">Existing instance — new workflows added, no new cost</div></td>
+        </tr>
+        <tr>
+          <td><strong>AWS SES</strong></td>
+          <td>Transactional email — dashboard auth, form confirmations</td>
+          <td><div class="cfree">~$0</div></td>
+          <td><div class="cnote">Existing account — negligible at this email volume</div></td>
+        </tr>
+        <tr>
+          <td><strong>Tailwind CSS v4</strong></td>
+          <td>Styling framework</td>
+          <td><div class="cfree">FREE</div></td>
+          <td><div class="cnote">MIT licensed</div></td>
+        </tr>
+        <tr class="ctotal">
+          <td><strong>Total Additional Monthly Cost</strong></td>
+          <td colspan="2"><strong style="color:#3db96a;font-size:15px;">$0.00 / month</strong></td>
+          <td><div class="cnote">Entirely on existing infrastructure and open-source stack</div></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <section class="footer-section">
+    <div class="footer-block">
+      <h3>What This Project Delivers</h3>
+      <ul>
+        <li>dgtlgroup.io migrated from WordPress — Next.js 15 + Payload CMS monorepo</li>
+        <li>Light visual refresh across all 8 pages — same brand, sharper execution</li>
+        <li>Blog, Team/Careers, and Legal/Privacy pages added (new)</li>
+        <li>Full Payload CMS admin — edit any page, post, team member, or portfolio item</li>
+        <li>Client dashboard at dashboard.dgtlgroup.io — 4 roles (Owner-protected), per-client module toggle</li>
+        <li>Dashboard v1 — files, invoices, tasks, announcements, work request form</li>
+        <li>Frappe ERPNext self-hosted — invoices + tasks API feeding the dashboard</li>
+        <li>Work requests → Frappe task + Dijital (Hermes Agent) WhatsApp alert via n8n</li>
+        <li>Contact form → Twenty CRM lead + Dijital alert — full lead capture intact</li>
+        <li>Dijital migrated from OpenClaw → Hermes Agent (skills, memory, persona, WhatsApp/Telegram all transferred)</li>
+        <li>Tailwind CSS v4 confirmed compatible — Next.js 15 built-in support, Payload v3 official guide exists</li>
+        <li>Gitea → GitHub → Hostinger CI/CD — every push auto-deploys</li>
+        <li>Zero new monthly costs — entirely on existing VPS and open-source stack</li>
+        <li>Dashboard v2 and v3 roadmap ready to execute post-launch</li>
+      </ul>
+    </div>
+    <div class="footer-block">
+      <h3>Open Questions / To Confirm</h3>
+      <ul>
+        <li>Frappe ERPNext subdomain — erp.dgtlgroup.io via Traefik, or internal VPS access only?</li>
+        <li>Client file storage — confirm Cloudinary 25 GB free tier covers initial clients, or upgrade needed?</li>
+        <li>Dashboard client onboarding — manual account creation via Payload admin, or self-service invite email flow?</li>
+        <li>n8n workflow scope — which ERPNext webhook events trigger WhatsApp alerts vs silent background sync?</li>
+        <li>Plausible per-client analytics — confirm embed scope for dashboard v3 reporting module</li>
+        <li>WordPress archive window — how long to keep old site accessible after DNS cutover?</li>
+        <li>Hermes Agent migration — run <code style="font-size:11px;color:var(--gold);">hermes claw migrate --dry-run</code> first to validate SOUL.md + messaging configs before cutting over</li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── DOC FOOTER ── -->
+<div class="doc-footer">
+  <div class="doc-footer-inner">
+    <div class="doc-footer-logo">
+      <svg viewBox="0 0 1133 744" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M221.797 286.332H138.578L93.3214 455.354H176.532C211.656 455.354 243.005 442.391 265.166 421.412C287.089 400.433 299.108 371.906 299.108 344.568C299.108 309.674 275.537 286.332 221.797 286.332ZM242.3 394.296C228.861 409.852 207.176 418.105 183.842 418.105H143.295L168.754 322.875H209.301C242.3 322.875 257.388 332.302 257.388 353.519C257.388 368.607 251.727 383.687 242.3 394.296Z" fill="white"/>
+        <path d="M379.743 394.066H436.79L432.072 411.509C424.294 416.456 412.98 421.88 390.581 421.88C355.22 421.88 339.196 410.804 339.196 388.643C339.196 369.551 348.156 350.689 361.825 338.669C374.558 327.593 391.763 320.988 411.799 320.988C445.035 320.988 459.418 329.004 466.72 339.612L496.658 312.505C484.868 295.529 463.66 283.51 425.229 283.51C387.045 283.51 356.163 295.062 334.003 315.335C311.136 336.552 297.23 368.14 297.23 397.84C297.23 440.037 331.41 459.367 378.791 459.367C401.896 459.367 444.797 452.056 468.131 427.541L486.279 359.886H388.932L379.743 394.066Z" fill="white"/>
+        <path d="M660.921 322.875L670.824 286.332H508.882L498.979 322.875H559.8L524.438 455.354H564.747L600.109 322.875H660.921Z" fill="white"/>
+        <path d="M716.191 286.332H676.111L630.855 455.354H769.93L779.833 418.105H680.829L716.191 286.332Z" fill="white"/>
+        <path d="M1039.67 371.642V371.583C1039.67 371.515 1039.66 371.447 1039.66 371.387C1039.65 371.243 1039.65 371.098 1039.63 370.962C1039.3 363.626 1033.27 357.778 1025.85 357.778H945.286C937.661 357.778 931.473 363.958 931.473 371.591V372.178C931.473 379.803 937.652 385.991 945.286 385.991H991.486L858.641 516.6L973.771 183.638C975.717 178.019 973.805 172.009 969.461 168.448C969.376 168.363 969.308 168.269 969.223 168.176C963.757 162.617 954.832 162.549 949.272 168.006L752.513 361.476C749.529 364.408 748.144 368.344 748.331 372.22C748.331 372.246 748.331 372.28 748.331 372.305V372.892C748.331 380.517 754.511 386.705 762.144 386.705H843.451C851.075 386.705 857.264 380.525 857.264 372.892V372.305C857.264 364.68 851.084 358.492 843.451 358.492H795.797L928.625 227.891L813.461 560.93C810.97 568.138 814.796 576.001 822.004 578.5L822.556 578.696C822.573 578.704 822.599 578.704 822.616 578.713C827.801 581.135 834.151 580.251 838.469 576.001L1035.47 382.31C1038.44 379.386 1039.83 375.493 1039.67 371.642Z" fill="#F0CF50"/>
+      </svg>
+    </div>
+    <span class="doc-footer-meta">Internal — DGTL Group Holdings Ltd. — April 2026</span>
+  </div>
+</div>
+
+</body>
+</html>
