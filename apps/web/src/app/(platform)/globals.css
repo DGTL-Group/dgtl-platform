@@ -1,29 +1,137 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────────────────────
+ * DGTL Design Tokens — Tailwind v4 @theme
+ *
+ * Source: extracted from dgtlgroup.io (WordPress) via Chrome DevTools on
+ * 2026-04-09. Full token reference at docs/design/tokens.md.
+ *
+ * The site is dark-mode only. No light-mode variant.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/* ── Brand variables ─────────────────────────────────────────────────────── */
+
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
+  /* Brand gold */
+  --gold:        #F0CF50;
+  --gold-dim:    rgba(240, 207, 80, 0.55);
+  --gold-pale:   rgba(240, 207, 80, 0.08);
+  --gold-border: rgba(240, 207, 80, 0.16);
+
+  /* Neutrals — dark-first */
+  --bg:          #000000;
+  --surface:     #111111;
+  --surface-2:   #1a1a1a;
+  --surface-3:   #222222;
+  --line:        #2a2a2a;
+  --white:       #ffffff;
+  --off-white:   #f0f0f0;
+  --muted:       #d0d0d0;
+  --stone:       #c3c4c7;
+  --faint:       rgba(255, 255, 255, 0.1);
+
+  /* Semantic */
+  --success:     #11AC84;
+  --error:       #EF877F;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #f0f0f0;
-  }
-}
+/* ── Tailwind v4 @theme ──────────────────────────────────────────────────── */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Colour tokens — available as bg-*, text-*, border-*, etc. */
+  --color-gold:        var(--gold);
+  --color-gold-dim:    var(--gold-dim);
+  --color-gold-pale:   var(--gold-pale);
+  --color-gold-border: var(--gold-border);
+
+  --color-background:  var(--bg);
+  --color-foreground:  var(--off-white);
+  --color-surface:     var(--surface);
+  --color-surface-2:   var(--surface-2);
+  --color-surface-3:   var(--surface-3);
+  --color-line:        var(--line);
+  --color-white:       var(--white);
+  --color-muted:       var(--muted);
+  --color-stone:       var(--stone);
+  --color-faint:       var(--faint);
+
+  --color-success:     var(--success);
+  --color-error:       var(--error);
+
+  /* Font family — Manrope via next/font/google */
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Font size scale — derived from computed styles on dgtlgroup.io
+   * Format: [font-size line-height] for Tailwind's text-* utilities.
+   * Named sizes like text-display, text-title, text-heading-1, etc. */
+  --text-display:    70px;
+  --text-display--line-height: 1.1;
+  --text-title:      60px;
+  --text-title--line-height: 1.08;
+  --text-heading-1:  45px;
+  --text-heading-1--line-height: 1.11;
+  --text-heading-2:  35px;
+  --text-heading-2--line-height: 1.14;
+  --text-heading-3:  24px;
+  --text-heading-3--line-height: 1.17;
+  --text-heading-4:  20px;
+  --text-heading-4--line-height: 1.4;
+  --text-card-title: 18px;
+  --text-card-title--line-height: 1.17;
+  --text-body-lg:    18px;
+  --text-body-lg--line-height: 1.5;
+  --text-body:       16px;
+  --text-body--line-height: 1.5;
+  --text-body-sm:    14px;
+  --text-body-sm--line-height: 1.5;
+  --text-caption:    13px;
+  --text-caption--line-height: 1.38;
+  --text-micro:      11px;
+  --text-micro--line-height: 1.45;
+
+  /* Border radius */
+  --radius-sm:   5px;
+  --radius:      7px;
+  --radius-md:   16px;
+  --radius-lg:   20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-glow-sm: 0 0 30px rgba(240, 207, 80, 0.2);
+  --shadow-glow-lg: 0 0 100px 20px rgba(240, 207, 80, 0.1);
+  --shadow-card:    0 3px 5px rgba(0, 0, 0, 0.2);
+  --shadow-soft:    0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Base reset ──────────────────────────────────────────────────────────── */
+
+html {
+  background: var(--bg);
+  color-scheme: dark;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    sans-serif;
+  background: var(--bg);
+  color: var(--off-white);
+  font-family: var(--font-sans);
+  font-weight: 400;   /* Reset from WP's aggressive 700 default */
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Heading defaults ────────────────────────────────────────────────────── */
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--white);
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+/* ── Selection ───────────────────────────────────────────────────────────── */
+
+::selection {
+  background: var(--gold);
+  color: var(--bg);
 }

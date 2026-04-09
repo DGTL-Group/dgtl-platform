@@ -1,5 +1,12 @@
 import type { Metadata } from 'next'
+import { Manrope } from 'next/font/google'
 import './globals.css'
+
+const manrope = Manrope({
+  subsets: ['latin'],
+  variable: '--font-manrope',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: {
@@ -16,18 +23,18 @@ export const metadata: Metadata = {
   },
 }
 
-// This is a ROOT layout for the (platform) route group. Because there is no
+// ROOT layout for the (platform) route group. Because there is no
 // src/app/layout.tsx, Next.js treats this as a real <html> root for every
-// route under (platform). The (payload) group has its own distinct root
-// layout so Payload's admin UI is fully isolated from the platform styling.
+// route under (platform). The (payload) group has its own distinct root layout
+// so Payload's admin UI is fully isolated from the platform styling.
 export default function PlatformRootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+    <html lang="en" className={`${manrope.variable} h-full`}>
+      <body className="min-h-full flex flex-col">
         {children}
       </body>
     </html>
