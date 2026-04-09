@@ -3,16 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "description": "DGTL Group platform monorepo — dgtlgroup.io rebuild + dashboard.dgtlgroup.io client portal",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
-    "dev": "pnpm --filter @dgtl/web dev",
-    "build": "pnpm --filter @dgtl/web build",
-    "start": "pnpm --filter @dgtl/web start",
-    "lint": "pnpm -r lint",
-    "typecheck": "pnpm -r exec tsc --noEmit"
+    "dev": "npm run dev -w @dgtl/web",
+    "build": "npm run build -w @dgtl/web",
+    "start": "npm run start -w @dgtl/web",
+    "lint": "npm run lint -w @dgtl/web",
+    "typecheck": "npm run typecheck -w @dgtl/web"
   },
   "packageManager": "pnpm@10.33.0"
 }
