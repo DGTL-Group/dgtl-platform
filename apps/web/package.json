@@ -2,6 +2,7 @@
   "name": "@dgtl/web",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --no-server-fast-refresh",
     "build": "next build",
@@ -31,5 +32,8 @@
     "sharp": "^0.34.5",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.0.0"
+  },
+  "devDependencies": {
+    "@swc-node/register": "^1.11.1"
   }
 }
