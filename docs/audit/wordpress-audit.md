@@ -650,3 +650,87 @@ The legacy `client-feedback` and `testimonial` CPTs are both in the sitemap but 
 - 3 real blog posts, 12 case studies, 11 orphan/profile pages, and all 5 core marketing pages were each individually fetched and analyzed.
 - A handful of pages that returned a Jina Reader CAPTCHA fallback (notably `/lum/` on first attempt) are noted in-line.
 - Schema markup was checked for but **not found** on any page; this should be re-verified directly in a browser before launch.
+
+---
+
+## Decisions Locked (2026-04-09)
+
+Will reviewed every URL via `docs/audit/url-decisions.xlsx`, saved the filled-in
+version as `url-decisions_updated.xlsx`, and ratified the final sitemap below.
+The redirect map is authoritative and lives at `apps/web/src/lib/redirects.ts`
+(consumed by `apps/web/src/proxy.ts` at the top of the request lifecycle).
+
+### Final sitemap (15 pages)
+
+```
+/                                         Home
+/about                                    About
+/services                                 Services
+/work                                     Portfolio index
+  /work/art-villas-costa-rica             Case study 1
+  /work/pacific-high-dewata               Case study 2
+/blog                                     Blog index
+  /blog/digital-marketing-strategy        Post 1 (slug trimmed)
+  /blog/consumer-behavior-2025            Post 2 (slug trimmed)
+  /blog/ui-ux-essentials                  Post 3 (slug trimmed)
+/contact                                  Contact
+/careers                                  Join DGTL Team (employees)
+/creators                                 Join DGTL Influence (creators)
+/privacy                                  Privacy (was /legal/privacy)
+/terms                                    Terms (was /legal/terms)
+```
+
+15 pages. Max 2 levels deep. No `/legal/` prefix. No `/insights/`. No orphan root URLs.
+
+### URL refresh applied
+
+| Change | Old | New |
+|---|---|---|
+| Drop `-us` suffix | `/about-us/`, `/contact-us/` | `/about`, `/contact` |
+| Rename "Join DGTL X" | `/join-dgtl-team/`, `/join-dgtl-influence/` | `/careers`, `/creators` |
+| Drop `/legal/` prefix | `/legal/privacy`, `/legal/terms` | `/privacy`, `/terms` |
+| Collapse `/insights/` | `/insights/` + stubs | `/blog` |
+| Trim case-study slugs | `/work/art-villas-costa-rica-content-campaign/` | `/work/art-villas-costa-rica` |
+| | `/work/pacific-high-dewata-content-campaign/` | `/work/pacific-high-dewata` |
+| Trim blog-post slugs | `/maximizing-your-digital-marketing-strategy/` | `/blog/digital-marketing-strategy` |
+| | `/understanding-consumer-behavior-in-2025/` | `/blog/consumer-behavior-2025` |
+| | `/essentials-when-building-new-website-ui-ux/` | `/blog/ui-ux-essentials` |
+
+### Cuts — rationale
+
+**10 of 12 case studies dropped** (Six Senses, Anker Nebula, Canon R10, Sounds of the City,
+Epidemic Sound Social, Swae Lee, Jassa Dhillon, ON Running, Spider-Man: RAF, Flocka MG, LUM
+case study): all work from an ex-business partner. Will wants nothing to do with it. Kept only
+Art Villas Costa Rica and Pacific High Dewata. **Portfolio will be rebuilt with 6–8 fresh case
+studies before cutover** — see `docs/launch-checklist.md` Content §Case studies.
+
+**11 orphan root URLs dropped** (`/dom/`, `/lum/`, `/tye/`, `/stacy/`, `/theburnstwins/`,
+`/kamil/`, `/5a1ive/`, `/shane/`, `/dmtv/`, `/dgtltags/`, `/lil-tjay-calgary-live-recap/`): DGTL
+no longer represents these talents, and the sub-brands (DMTV, DGTL Tags) are not part of
+`dgtlgroup.io` going forward. Lil Tjay is also ex-partner work.
+
+**All 6 `/category/*` WordPress archives dropped**: collapse into a single `/blog` index. The
+new blog will use tag-based filtering inside Payload if/when it grows beyond the initial post count.
+
+**All `/insights/` stubs dropped**: 2 had no real content behind them anywhere on the site; the
+third was a duplicate of a root-URL article. One (`the-future-of-digital-marketing`) was a stub
+that never had an article written — Will confirmed it's killed, not revived.
+
+**8 placeholder / empty CPT entries dropped** (services-lists lorem-ipsum, empty
+`/client-feedback/` and `/testimonial/` CPTs): these leaked into production as placeholders.
+Real testimonials already live in the homepage HTML and will be moved to a Payload
+`testimonials` collection.
+
+**`/testing-page/` and `/locations.kml`**: should never have been public. `410 Gone` for both.
+
+### Redirect map summary
+
+| Status | Count | Examples |
+|---|---|---|
+| 301 | 42 | `/about-us` → `/about`, `/work/six-senses-content-campaign` → `/work` |
+| 410 | 6 + 4 wildcards | `/testing-page`, `/services-lists/...`, `/wp-admin/*`, `/wp-content/*` |
+| Passthrough (kept) | 15 pages | see sitemap above |
+
+Full map in `apps/web/src/lib/redirects.ts`. Every entry is type-checked and exercised by
+`proxy.ts` on every request. See `docs/launch-checklist.md` SEO § for the post-deploy
+verification checklist.
