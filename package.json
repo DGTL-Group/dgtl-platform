@@ -9,8 +9,8 @@
   },
   "scripts": {
     "dev": "pnpm --filter @dgtl/web dev",
-    "build": "pnpm --filter @dgtl/web build",
-    "start": "pnpm --filter @dgtl/web start",
+    "build": "cd apps/web && next build",
+    "start": "cd apps/web && next start",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r exec tsc --noEmit"
   },
