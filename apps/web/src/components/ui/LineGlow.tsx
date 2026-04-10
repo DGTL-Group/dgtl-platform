@@ -5,35 +5,51 @@ import { useEffect, useRef } from 'react'
 /**
  * Single light source → specular reflections on 4 metal lines.
  * One rAF loop, one lightX, all highlights derived from it.
- * Diagonals: stroke-dasharray on <path> (works with filter).
- * Horizontals: <rect> positioned by x attribute (filter breaks dasharray on horizontals).
+ * All 4 lines use soft radial-gradient ellipses — same visual treatment.
+ * Diagonals are rotated to match their line angle.
  */
 
-const DIAGONALS = [
-  { x1: 2200, y1: -440, x2: 706.27, y2: 1049.27, xMin: 706, xMax: 2200 },
-  { x1: 1530, y1: -385, x2: 60.39, y2: 1079.38, xMin: 60, xMax: 1530 },
+const LINES = [
+  { // Diagonal 1: top-right → bottom-left
+    x1: 2200, y1: -440, x2: 706.27, y2: 1049.27,
+    xMin: 706, xMax: 2200,
+    angle: Math.atan2(1049.27 - (-440), 706.27 - 2200) * (180 / Math.PI),
+    segW: 420, clipId: null,
+  },
+  { // Horizontal right: spark → right edge
+    x1: 1033, y1: 487.5, x2: 2200, y2: 487.5,
+    xMin: 1033, xMax: 2200,
+    angle: 0,
+    segW: 455, clipId: 'clip-hr',
+  },
+  { // Horizontal left: left edge → spark
+    x1: -200, y1: 546.5, x2: 841, y2: 546.5,
+    xMin: -200, xMax: 841,
+    angle: 0,
+    segW: 395, clipId: 'clip-hl',
+  },
+  { // Diagonal 2: top-center → bottom-left
+    x1: 1530, y1: -385, x2: 60.39, y2: 1079.38,
+    xMin: 60, xMax: 1530,
+    angle: Math.atan2(1079.38 - (-385), 60.39 - 1530) * (180 / Math.PI),
+    segW: 400, clipId: null,
+  },
 ]
 
-const HORIZONTALS = [
-  { xMin: 1033, xMax: 2200, y: 487.5, rectY: 486, segW: 100 },
-  { xMin: -200, xMax: 841, y: 546.5, rectY: 545, segW: 80 },
-]
+function getPointOnLine(line: typeof LINES[0], lightX: number) {
+  const t = (lightX - line.x1) / (line.x2 - line.x1)
+  return {
+    x: lightX,
+    y: line.y1 + t * (line.y2 - line.y1),
+  }
+}
 
 export function LineGlow() {
-  const diagRefs = useRef<(SVGPathElement | null)[]>([])
-  const horizRefs = useRef<(SVGRectElement | null)[]>([])
+  const ellipseRefs = useRef<(SVGEllipseElement | null)[]>([])
 
   useEffect(() => {
-    const diags = diagRefs.current.filter(Boolean) as SVGPathElement[]
-    const horizs = horizRefs.current.filter(Boolean) as SVGRectElement[]
-    if (diags.length !== 2 || horizs.length !== 2) return
-
-    const diagLens = diags.map(p => p.getTotalLength())
-    const segLens = [120, 110]
-
-    diags.forEach((p, i) => {
-      p.style.strokeDasharray = `${segLens[i]} ${diagLens[i] + segLens[i]}`
-    })
+    const ellipses = ellipseRefs.current.filter(Boolean) as SVGEllipseElement[]
+    if (ellipses.length !== LINES.length) return
 
     const SWEEP_MS = 8000
     const PAUSE_MS = 5000
@@ -49,34 +65,17 @@ export function LineGlow() {
       const inSweep = t < SWEEP_MS
       const lightX = inSweep ? X_START - (t / SWEEP_MS) * X_RANGE : -9999
 
-      // Diagonals — stroke-dashoffset
-      DIAGONALS.forEach((line, i) => {
-        const p = diags[i]
-        const len = diagLens[i]
-        const seg = segLens[i]
-
+      LINES.forEach((line, i) => {
+        const el = ellipses[i]
         if (!inSweep || lightX > line.xMax || lightX < line.xMin) {
-          p.style.opacity = '0'
+          el.style.opacity = '0'
           return
         }
 
-        const progress = (lightX - line.x1) / (line.x2 - line.x1)
-        const offset = seg - progress * (len + seg)
-        p.style.strokeDashoffset = `${offset}`
-        p.style.opacity = '1'
-      })
-
-      // Horizontals — rect x position
-      HORIZONTALS.forEach((line, i) => {
-        const rect = horizs[i]
-
-        if (!inSweep || lightX > line.xMax || lightX < line.xMin) {
-          rect.style.opacity = '0'
-          return
-        }
-
-        rect.setAttribute('x', `${lightX - line.segW / 2}`)
-        rect.style.opacity = '1'
+        const pt = getPointOnLine(line, lightX)
+        el.setAttribute('cx', `${pt.x}`)
+        el.setAttribute('cy', `${pt.y}`)
+        el.style.opacity = '1'
       })
 
       rafId = requestAnimationFrame(animate)
@@ -96,62 +95,41 @@ export function LineGlow() {
       style={{ transition: 'none' }}
     >
       <defs>
-        <filter id="specular" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="core" />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="halo" />
-          <feMerge>
-            <feMergeNode in="halo" />
-            <feMergeNode in="core" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
+        <radialGradient id="glow" cx="50%" cy="50%" rx="50%" ry="50%">
+          <stop offset="0%" stopColor="rgba(255,250,230,0.25)" />
+          <stop offset="15%" stopColor="rgba(240,220,160,0.18)" />
+          <stop offset="40%" stopColor="rgba(240,220,160,0.08)" />
+          <stop offset="65%" stopColor="rgba(240,220,160,0.03)" />
+          <stop offset="85%" stopColor="rgba(240,220,160,0.005)" />
+          <stop offset="100%" stopColor="rgba(240,220,160,0)" />
+        </radialGradient>
+
         <clipPath id="clip-hr">
-          <rect x="1033" y="478" width="1200" height="20" />
+          <rect x="1033" y="470" width="1200" height="36" />
         </clipPath>
         <clipPath id="clip-hl">
-          <rect x="-200" y="537" width="1041" height="20" />
+          <rect x="-200" y="529" width="1041" height="36" />
         </clipPath>
       </defs>
 
-      {/* Diagonal paths — stroke-dasharray works with filter */}
-      {DIAGONALS.map((line, i) => (
-        <path
-          key={`d${i}`}
-          ref={el => { diagRefs.current[i] = el }}
-          d={`M${line.x1},${line.y1} L${line.x2},${line.y2}`}
-          stroke="rgba(240,220,160,0.85)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          filter="url(#specular)"
-          style={{ opacity: 0, transition: 'none' }}
-        />
-      ))}
+      {LINES.map((line, i) => {
+        const ellipse = (
+          <ellipse
+            key={i}
+            ref={el => { ellipseRefs.current[i] = el }}
+            rx={line.segW / 2}
+            ry={1.8}
+            fill="url(#glow)"
+            transform={line.angle !== 0 ? `rotate(${line.angle})` : undefined}
+            style={{ opacity: 0, transition: 'none', transformOrigin: 'center', transformBox: 'fill-box' }}
+          />
+        )
 
-      {/* Horizontal rects — clipped to line bounds */}
-      <g clipPath="url(#clip-hr)">
-        <rect
-          ref={el => { horizRefs.current[0] = el }}
-          y={HORIZONTALS[0].rectY}
-          width={HORIZONTALS[0].segW}
-          height={3}
-          rx={1.5}
-          fill="rgba(240,220,160,0.85)"
-          filter="url(#specular)"
-          style={{ opacity: 0, transition: 'none' }}
-        />
-      </g>
-      <g clipPath="url(#clip-hl)">
-        <rect
-          ref={el => { horizRefs.current[1] = el }}
-          y={HORIZONTALS[1].rectY}
-          width={HORIZONTALS[1].segW}
-          height={3}
-          rx={1.5}
-          fill="rgba(240,220,160,0.85)"
-          filter="url(#specular)"
-          style={{ opacity: 0, transition: 'none' }}
-        />
-      </g>
+        if (line.clipId) {
+          return <g key={i} clipPath={`url(#${line.clipId})`}>{ellipse}</g>
+        }
+        return ellipse
+      })}
     </svg>
   )
 }
