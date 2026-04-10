@@ -10,11 +10,12 @@ type ButtonProps = ComponentProps<'a'> & {
 
 const variantStyles: Record<Variant, string> = {
   primary:
-    'bg-gold text-black border-gold hover:bg-[#e0bf40] hover:border-[#e0bf40] ' +
-    'focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background ' +
-    'shadow-[var(--shadow-glow-sm)]',
+    'bg-gold text-black border-gold ' +
+    'hover:bg-[#d4b438] hover:border-[#d4b438] ' +
+    'focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
   secondary:
-    'bg-transparent text-white border-white/80 hover:bg-faint hover:border-white ' +
+    'bg-transparent text-white border-white/40 ' +
+    'hover:bg-white hover:text-black hover:border-white ' +
     'focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
   ghost:
     'bg-transparent text-muted border-transparent hover:text-white ' +
@@ -33,6 +34,25 @@ const sizeStyles: Record<Size, string> = {
  * Renders as `<a>` by default (most CTAs are links). For form submit buttons,
  * swap the underlying element when we build the form components.
  */
+export function ButtonArrow() {
+  return (
+    <svg
+      className="inline-block ml-1 transition-transform duration-300 ease-out group-hover:translate-x-1"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="1" y1="8" x2="14" y2="8" />
+      <polyline points="9 3 14 8 9 13" />
+    </svg>
+  )
+}
+
 export function Button({
   variant = 'primary',
   size = 'default',
@@ -43,9 +63,9 @@ export function Button({
   return (
     <a
       className={[
-        'inline-flex items-center justify-center gap-2',
+        'group btn inline-flex items-center justify-center gap-2',
         'border font-bold tracking-normal whitespace-nowrap',
-        'transition-all duration-200 ease-out',
+        'transition-all duration-300 ease-out',
         'select-none cursor-pointer',
         variantStyles[variant],
         sizeStyles[size],

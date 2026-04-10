@@ -109,16 +109,24 @@ html {
   background: var(--bg);
   color-scheme: dark;
   scroll-behavior: smooth;
+  scroll-padding-top: 72px;  /* Fixed navbar height */
 }
 
 body {
-  background: var(--bg);
+  background: var(--bg) url('/bg/hero-desktop.svg') no-repeat center center fixed;
+  background-size: cover;
   color: var(--off-white);
   font-family: var(--font-sans);
   font-weight: 400;   /* Reset from WP's aggressive 700 default */
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@media (max-width: 767px) {
+  body {
+    background-image: url('/bg/hero-mobile.svg') !important;
+  }
 }
 
 /* ── Heading defaults ────────────────────────────────────────────────────── */
@@ -129,9 +137,63 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
 }
 
+/* ── Global transition duration ──────────────────────────────────────────── */
+
+*, *::before, *::after {
+  transition-duration: 500ms !important;
+  transition-timing-function: ease-in-out !important;
+}
+
+[data-framer] {
+  transition: none !important;
+}
+
+/* ── Link hover — gold on any white/light text link ─────────────────────── */
+
+a:not(.btn) {
+  transition: color 500ms ease-out;
+}
+
+a:not(.btn):hover {
+  color: var(--gold);
+}
+
+/* ── Scroll indicator ────────────────────────────────────────────────────── */
+
+.scroll-mouse {
+  width: 24px;
+  height: 38px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  position: relative;
+}
+
+.scroll-wheel {
+  width: 4px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 2px;
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  transform: translateX(-50%);
+  animation: scroll-wheel 2.5s ease-in-out infinite !important;
+}
+
+.scroll-wheel {
+  transition: none !important;
+}
+
+@keyframes scroll-wheel {
+  0%, 100% { opacity: 1; top: 6px; animation-timing-function: ease-in-out; }
+  50% { opacity: 0.3; top: 12px; animation-timing-function: ease-in-out; }
+}
+
+
 /* ── Selection ───────────────────────────────────────────────────────────── */
 
 ::selection {
   background: var(--gold);
   color: var(--bg);
 }
+

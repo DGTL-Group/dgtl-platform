@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   description:
     'DGTL Group builds modern web, AI automation, content, and growth strategy for ambitious brands.',
   metadataBase: new URL('https://dgtlgroup.io'),
+  icons: {
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/apple-icon.svg', type: 'image/svg+xml' }],
+  },
   openGraph: {
     type: 'website',
     locale: 'en_CA',
