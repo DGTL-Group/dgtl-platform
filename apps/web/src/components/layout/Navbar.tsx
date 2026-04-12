@@ -118,7 +118,7 @@ export function Navbar() {
           width: glowPos ? glowPos.width + 80 : 0,
           height: '16px',
           transform: 'translateX(-50%)',
-          background: 'radial-gradient(ellipse at center top, rgba(240, 207, 80, 0.3) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse at center top, rgba(240, 207, 80, 0.4) 0%, transparent 70%)',
           filter: 'blur(8px)',
           opacity: glowPos ? 1 : 0,
           transition: 'left 500ms ease-in-out, width 500ms ease-in-out, opacity 500ms ease-in-out',

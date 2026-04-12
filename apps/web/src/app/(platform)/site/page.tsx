@@ -24,8 +24,8 @@ export default function SiteHome() {
             <Button href="https://calendar.dgtlgroup.io/team/dgtl-group/assessment-call">
               Book a Call <ButtonArrow />
             </Button>
-            <Button variant="secondary" href="https://book.dgtlgroup.io">
-              Book Studio
+            <Button variant="secondary" href="/about">
+              Learn More
             </Button>
           </div>
 
@@ -34,28 +34,58 @@ export default function SiteHome() {
             <div className="scroll-mouse">
               <div className="scroll-wheel" />
             </div>
-            <motion.svg
-              data-framer=""
-              width="20"
-              height="16"
-              viewBox="0 0 20 16"
-              fill="none"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              animate={{
-                y: [0, 4, 0],
-                stroke: ['rgba(255,255,255,0.8)', '#F0CF50', 'rgba(255,255,255,0.8)'],
-              }}
-              transition={{
-                duration: 2.5,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            >
-              <polyline points="2 2 10 8 18 2" />
-              <polyline points="2 8 10 14 18 8" />
-            </motion.svg>
+            <div className="relative w-5 h-4">
+              {/* White chevron — fades out as it bounces down */}
+              <motion.svg
+                data-framer=""
+                className="absolute inset-0"
+                width="20"
+                height="16"
+                viewBox="0 0 20 16"
+                fill="none"
+                stroke="rgba(255,255,255,0.8)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                animate={{
+                  y: [0, 4, 0],
+                  opacity: [1, 0, 1],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              >
+                <polyline points="2 2 10 8 18 2" />
+                <polyline points="2 8 10 14 18 8" />
+              </motion.svg>
+              {/* Gold chevron — fades in as it bounces down */}
+              <motion.svg
+                data-framer=""
+                className="absolute inset-0"
+                width="20"
+                height="16"
+                viewBox="0 0 20 16"
+                fill="none"
+                stroke="#F0CF50"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                animate={{
+                  y: [0, 4, 0],
+                  opacity: [0, 1, 0],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              >
+                <polyline points="2 2 10 8 18 2" />
+                <polyline points="2 8 10 14 18 8" />
+              </motion.svg>
+            </div>
           </div>
         </Container>
       </Section>
