@@ -51,6 +51,7 @@ export function LineGlow() {
       const lightX = inSweep ? X_START - (t / SWEEP_MS) * X_RANGE : -9999
 
       // Line reflections
+      const EDGE_FADE = 200 // px over which to fade near line edges
       LINES.forEach((line, i) => {
         const el = ellipses[i]
         if (!inSweep || lightX > line.xMax || lightX < line.xMin) {
@@ -60,7 +61,16 @@ export function LineGlow() {
         const pt = getPointOnLine(line, lightX)
         el.setAttribute('cx', `${pt.x}`)
         el.setAttribute('cy', `${pt.y}`)
-        el.style.opacity = '1'
+
+        // Smooth fade near line edges (especially around the logo gap)
+        let opacity = 1
+        if (lightX < line.xMin + EDGE_FADE) {
+          opacity = Math.max(0, (lightX - line.xMin) / EDGE_FADE)
+        }
+        if (lightX > line.xMax - EDGE_FADE) {
+          opacity = Math.min(opacity, Math.max(0, (line.xMax - lightX) / EDGE_FADE))
+        }
+        el.style.opacity = `${opacity}`
       })
 
       // Spark reflection — offset slightly ahead to sync visually with line reflections
@@ -85,11 +95,11 @@ export function LineGlow() {
     >
       <defs>
         <radialGradient id="glow" cx="50%" cy="50%" rx="50%" ry="50%">
-          <stop offset="0%" stopColor="rgba(255,250,230,0.25)" />
-          <stop offset="15%" stopColor="rgba(240,220,160,0.18)" />
-          <stop offset="40%" stopColor="rgba(240,220,160,0.08)" />
-          <stop offset="65%" stopColor="rgba(240,220,160,0.03)" />
-          <stop offset="85%" stopColor="rgba(240,220,160,0.005)" />
+          <stop offset="0%" stopColor="rgba(255,250,230,0.20)" />
+          <stop offset="15%" stopColor="rgba(240,220,160,0.144)" />
+          <stop offset="40%" stopColor="rgba(240,220,160,0.064)" />
+          <stop offset="65%" stopColor="rgba(240,220,160,0.024)" />
+          <stop offset="85%" stopColor="rgba(240,220,160,0.004)" />
           <stop offset="100%" stopColor="rgba(240,220,160,0)" />
         </radialGradient>
 
@@ -124,7 +134,7 @@ export function LineGlow() {
       <path
         d={SPARK_PATH}
         fill="#F0CF50"
-        fillOpacity={0.15}
+        fillOpacity={0.23}
         mask="url(#spark-mask)"
         style={{ transition: 'none' }}
       />

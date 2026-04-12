@@ -113,7 +113,8 @@ html {
 }
 
 body {
-  background: var(--bg) url('/bg/hero-desktop.svg') no-repeat center center fixed;
+  background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('/bg/hero-desktop.svg') no-repeat center center fixed;
+  background-color: var(--bg);
   background-size: cover;
   color: var(--off-white);
   font-family: var(--font-sans);
@@ -189,6 +190,17 @@ a:not(.btn):hover {
   50% { opacity: 0.3; top: 12px; animation-timing-function: ease-in-out; }
 }
 
+
+/* ── Logo carousel marquee ──────────────────────────────────────────────── */
+
+.animate-marquee {
+  animation: marquee 40s linear infinite !important;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
 
 /* ── Selection ───────────────────────────────────────────────────────────── */
 

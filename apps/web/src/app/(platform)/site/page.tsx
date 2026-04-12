@@ -1,13 +1,57 @@
 'use client'
 
+import { useState } from 'react'
+import Image from 'next/image'
 import { Button, ButtonArrow, SectionHeading, Container, Section } from '@/components'
-import { motion } from 'framer-motion'
+import { LogoCarousel } from '@/components/ui/LogoCarousel'
+import { motion, AnimatePresence } from 'framer-motion'
+
+const SERVICES = [
+  {
+    name: 'Content Creation',
+    desc: 'Boost your brand with captivating content! DGTL offers tailored content creation services designed to engage, inspire, and drive action. From blogs and social media posts to eye-catching visuals, we craft content that amplifies your voice and impact.',
+    icon: '\u26A1',
+    image: '/images/services/content-creation.jpg',
+  },
+  {
+    name: 'Social Media Marketing',
+    desc: 'Build a powerful social presence that connects with your audience. We develop data-driven social strategies, manage your channels, and create scroll-stopping content that drives engagement and growth.',
+    icon: '\u{1F4F1}',
+    image: '/images/services/social-media.jpg',
+  },
+  {
+    name: 'Influencer Marketing',
+    desc: 'Leverage the power of authentic voices to amplify your brand. We connect you with the right influencers, manage campaigns end-to-end, and deliver measurable results that build trust and awareness.',
+    icon: '\u2B50',
+    image: '/images/services/influencer.jpg',
+  },
+  {
+    name: 'Public Relations',
+    desc: 'Shape your brand narrative and earn media coverage that matters. From press releases to media outreach, we craft compelling stories that position your brand as an industry leader.',
+    icon: '\u{1F4E2}',
+    image: '/images/services/public-relations.jpg',
+  },
+  {
+    name: 'Web Design & Development',
+    desc: 'Create stunning, high-performance websites that convert. Our team designs and develops custom web experiences that reflect your brand, engage visitors, and drive business results.',
+    icon: '\u{1F4BB}',
+    image: '/images/services/web-development.jpg',
+  },
+  {
+    name: 'Graphics Design',
+    desc: 'From brand identities to marketing collateral, our design team creates visuals that captivate and communicate. Every pixel is crafted to elevate your brand and leave a lasting impression.',
+    icon: '\u{1F3A8}',
+    image: '/images/services/graphics-design.jpg',
+  },
+]
 
 export default function SiteHome() {
+  const [activeService, setActiveService] = useState(0)
+
   return (
     <>
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <Section spacing="lg" bg="default" className="!bg-transparent relative flex flex-col items-center justify-center min-h-screen md:h-screen text-center overflow-hidden">
+      <Section spacing="lg" className="!bg-transparent relative flex flex-col items-center justify-center min-h-screen md:h-screen text-center overflow-hidden">
         <Container className="relative z-10">
           <h1 className="text-title font-semibold tracking-[-0.023em] text-white max-w-3xl mx-auto sm:text-display sm:tracking-[-0.02em]">
             Transforming Brands with Innovative Creative Solutions
@@ -30,7 +74,32 @@ export default function SiteHome() {
           </div>
 
           {/* Scroll indicator */}
-          <div className="mt-16 flex flex-col items-center gap-2">
+          <button
+            type="button"
+            className="btn mt-16 mx-auto flex flex-col items-center gap-2 cursor-pointer bg-transparent border-none"
+            onClick={() => {
+              const target = document.getElementById('trusted-by')
+              if (!target) return
+              const start = window.scrollY
+              const end = target.getBoundingClientRect().top + window.scrollY - 72
+              const distance = end - start
+              const duration = 1500
+              let startTime: number | null = null
+
+              function easeInOut(t: number) {
+                return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+              }
+
+              function step(time: number) {
+                if (!startTime) startTime = time
+                const elapsed = Math.min((time - startTime) / duration, 1)
+                window.scrollTo(0, start + distance * easeInOut(elapsed))
+                if (elapsed < 1) requestAnimationFrame(step)
+              }
+
+              requestAnimationFrame(step)
+            }}
+          >
             <div className="scroll-mouse">
               <div className="scroll-wheel" />
             </div>
@@ -86,37 +155,99 @@ export default function SiteHome() {
                 <polyline points="2 8 10 14 18 8" />
               </motion.svg>
             </div>
-          </div>
+          </button>
         </Container>
       </Section>
 
       {/* ── Trusted By ────────────────────────────────────────────────────── */}
-      <Section spacing="sm" bg="surface">
+      <Section id="trusted-by" className="!bg-transparent !pt-40 !pb-20">
+        <p className="text-center text-body-sm text-muted uppercase tracking-[0.15em] mb-24">
+          Trusted by industry leaders and innovators worldwide
+        </p>
+        <LogoCarousel />
+      </Section>
+
+      {/* ── Services Selector ─────────────────────────────────────────────── */}
+      <Section className="!bg-transparent">
         <Container>
-          <p className="text-center text-body-sm text-muted uppercase tracking-[0.15em]">
-            Trusted by industry leaders and innovators worldwide
-          </p>
-          {/* Client logos will go here — Payload CMS Phase 03 */}
-          <div className="mt-8 flex items-center justify-center gap-12 opacity-40">
-            {['Client 1', 'Client 2', 'Client 3', 'Client 4', 'Client 5'].map((name) => (
-              <div key={name} className="h-8 w-24 rounded bg-surface-3" />
-            ))}
+          <h2 className="text-heading-1 font-bold text-white tracking-[-0.02em] text-center mb-16">
+            Unlock Your Brand&apos;s Potential with Comprehensive Digital
+            Marketing Solutions
+          </h2>
+
+          <div className="grid gap-10 lg:grid-cols-[2fr_3fr] lg:items-center">
+            {/* Left — Image + detail card */}
+            <div className="relative">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`img-${activeService}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="aspect-[3/4] rounded-[var(--radius-lg)] border border-line overflow-hidden relative"
+                >
+                  <Image
+                    src={SERVICES[activeService].image}
+                    alt={SERVICES[activeService].name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Overlay card */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeService}
+                  initial={{ opacity: 0, y: 'calc(50% + 20px)' }}
+                  animate={{ opacity: 1, y: '50%' }}
+                  exit={{ opacity: 0, y: 'calc(50% - 20px)' }}
+                  transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+                  className="absolute bottom-0 left-0 right-0 sm:left-auto sm:right-4 sm:max-w-sm rounded-[var(--radius-md)] border border-line bg-surface-2/90 backdrop-blur-md p-5"
+                >
+                  <div className="mb-3 h-10 w-10 rounded-[var(--radius)] bg-gold-pale flex items-center justify-center">
+                    <span className="text-gold text-lg">{SERVICES[activeService].icon}</span>
+                  </div>
+                  <h3 className="text-card-title font-bold text-white tracking-[-0.02em]">
+                    {SERVICES[activeService].name}
+                  </h3>
+                  <p className="mt-2 text-body-sm text-stone leading-relaxed">
+                    {SERVICES[activeService].desc}
+                  </p>
+                  <div className="mt-4">
+                    <Button variant="ghost" href="/services" className="!p-0 !text-white">
+                      <ButtonArrow />
+                    </Button>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Right — Service menu */}
+            <div className="flex flex-col gap-3 lg:justify-center">
+              {SERVICES.map((service, i) => (
+                <button
+                  key={service.name}
+                  type="button"
+                  onClick={() => setActiveService(i)}
+                  className={`text-left text-heading-1 font-bold tracking-[-0.02em] transition-colors duration-200 cursor-pointer bg-transparent border-none py-1 ${
+                    i === activeService
+                      ? 'text-white'
+                      : 'text-white/20 hover:text-white/40'
+                  }`}
+                >
+                  {service.name}
+                </button>
+              ))}
+            </div>
           </div>
         </Container>
       </Section>
 
-      {/* ── CTA — Unlock Potential ─────────────────────────────────────────── */}
-      <Section>
-        <Container size="narrow" className="text-center">
-          <h2 className="text-heading-1 font-bold text-white tracking-[-0.02em]">
-            Unlock Your Brand&apos;s Potential with Comprehensive Digital
-            Marketing Solutions
-          </h2>
-        </Container>
-      </Section>
-
       {/* ── Portfolio ─────────────────────────────────────────────────────── */}
-      <Section id="work" bg="surface">
+      <Section id="work" className="!bg-transparent">
         <Container>
           <SectionHeading
             eyebrow="Portfolio"
@@ -178,7 +309,7 @@ export default function SiteHome() {
       </Section>
 
       {/* ── About / Empowering Brands ─────────────────────────────────────── */}
-      <Section>
+      <Section className="!bg-transparent">
         <Container>
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
@@ -204,48 +335,9 @@ export default function SiteHome() {
         </Container>
       </Section>
 
-      {/* ── Services ──────────────────────────────────────────────────────── */}
-      <Section id="services" bg="surface">
-        <Container>
-          <SectionHeading
-            eyebrow="Our Services"
-            subtitle="Discover how our tailored solutions can elevate your brand and drive measurable results."
-            center
-          >
-            Comprehensive Digital Marketing
-          </SectionHeading>
-
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              'Content Creation',
-              'Social Media Marketing',
-              'Influencer Marketing',
-              'Public Relations',
-              'Web Design & Development',
-              'Graphics Design',
-            ].map((name) => (
-              <div
-                key={name}
-                className="rounded-[var(--radius-md)] border border-line bg-surface-2 p-6 transition-colors hover:border-gold-border"
-              >
-                <div className="mb-3 h-10 w-10 rounded-[var(--radius)] bg-gold-pale flex items-center justify-center">
-                  <span className="text-gold text-lg">&#9889;</span>
-                </div>
-                <h3 className="text-card-title font-bold text-white tracking-[-0.02em]">
-                  {name}
-                </h3>
-                <p className="mt-2 text-body-sm text-stone leading-relaxed">
-                  Placeholder — service descriptions will be populated from
-                  Payload CMS in Phase 03.
-                </p>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </Section>
 
       {/* ── Join the Team ─────────────────────────────────────────────────── */}
-      <Section>
+      <Section className="!bg-transparent">
         <Container>
           <div className="text-center">
             <h2 className="text-heading-1 font-bold text-white tracking-[-0.02em]">
@@ -264,7 +356,7 @@ export default function SiteHome() {
       </Section>
 
       {/* ── Testimonials ──────────────────────────────────────────────────── */}
-      <Section bg="surface">
+      <Section className="!bg-transparent">
         <Container>
           <SectionHeading
             eyebrow="Testimonials"
@@ -303,7 +395,7 @@ export default function SiteHome() {
       </Section>
 
       {/* ── Brand Statement ───────────────────────────────────────────────── */}
-      <Section>
+      <Section className="!bg-transparent">
         <Container size="narrow" className="text-center">
           <h2 className="text-heading-1 font-bold text-white tracking-[-0.02em]">
             Branding, websites and digital experiences, crafted with
@@ -313,7 +405,7 @@ export default function SiteHome() {
       </Section>
 
       {/* ── Newsletter ────────────────────────────────────────────────────── */}
-      <Section bg="surface">
+      <Section className="!bg-transparent">
         <Container size="narrow" className="text-center">
           <h2 className="text-heading-2 font-bold text-white tracking-[-0.02em]">
             Join Our Thriving Community
@@ -336,7 +428,7 @@ export default function SiteHome() {
       </Section>
 
       {/* ── Contact CTA ───────────────────────────────────────────────────── */}
-      <Section className="text-center">
+      <Section className="!bg-transparent text-center">
         <Container size="narrow">
           <h2 className="text-heading-1 font-bold text-white tracking-[-0.02em]">
             Get in Touch
