@@ -202,6 +202,11 @@ a:not(.btn):hover {
   to { transform: translateX(-50%); }
 }
 
+@keyframes tw-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 /* ── Selection ───────────────────────────────────────────────────────────── */
 
 ::selection {

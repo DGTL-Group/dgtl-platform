@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Button, ButtonArrow, SectionHeading, Container, Section } from '@/components'
 import { LogoCarousel } from '@/components/ui/LogoCarousel'
@@ -76,6 +76,64 @@ const PORTFOLIO_PROJECTS = [
     categories: ['Content Creation'],
   },
 ]
+
+const TW_WORDS = ['love.', 'care.', 'passion.']
+
+function TypewriterWord() {
+  const [display, setDisplay] = useState('')
+  const [cursorBlink, setCursorBlink] = useState(true)
+
+  useEffect(() => {
+    let wi = 0, ci = 0, deleting = false
+    let timeout: ReturnType<typeof setTimeout>
+
+    function step() {
+      const word = TW_WORDS[wi]
+      if (!deleting) {
+        ci++
+        setDisplay(word.slice(0, ci))
+        setCursorBlink(false)
+        if (ci === word.length) {
+          deleting = true
+          setCursorBlink(true)
+          timeout = setTimeout(step, 2500)
+          return
+        }
+        timeout = setTimeout(step, 90)
+      } else {
+        ci--
+        setDisplay(word.slice(0, ci))
+        setCursorBlink(false)
+        if (ci === 0) {
+          deleting = false
+          wi = (wi + 1) % TW_WORDS.length
+          setCursorBlink(true)
+          timeout = setTimeout(step, 450)
+          return
+        }
+        timeout = setTimeout(step, 50)
+      }
+    }
+
+    timeout = setTimeout(step, 1400)
+    return () => clearTimeout(timeout)
+  }, [])
+
+  return (
+    <>
+      <span className="text-gold">{display}</span>
+      <span
+        className="text-gold font-light text-[1.35em] leading-none align-middle inline-block ml-0.5"
+        style={{
+          animation: cursorBlink ? 'tw-blink 1.06s step-end infinite' : 'none',
+          opacity: cursorBlink ? undefined : 1,
+        }}
+      >
+        |
+      </span>
+    </>
+  )
+}
 
 export default function SiteHome() {
   const [activeService, setActiveService] = useState(0)
@@ -461,12 +519,13 @@ export default function SiteHome() {
         </Container>
       </Section>
 
-      {/* ── Brand Statement ───────────────────────────────────────────────── */}
+      {/* ── Brand Statement — Typewriter ────────────────────────────────── */}
       <Section className="!bg-transparent">
-        <Container size="narrow" className="text-center">
-          <h2 className="text-heading-1 font-bold text-white tracking-[-0.02em]">
+        <Container className="text-center">
+          <h2 className="text-[36px] sm:text-[70px] font-extrabold text-white tracking-[-1.4px] leading-[1.1] mx-auto">
             Branding, websites and digital experiences, crafted with
-            brilliance, attention, precision and&hellip;
+            brilliance, attention, precision and{' '}
+            <TypewriterWord />
           </h2>
         </Container>
       </Section>
