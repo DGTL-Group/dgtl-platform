@@ -33,7 +33,7 @@ export function SectionHeading({
         {children}
       </Tag>
       {subtitle && (
-        <p className="mt-4 text-body-lg text-muted max-w-2xl">
+        <p className={`mt-4 text-body-lg text-muted max-w-2xl ${center ? 'mx-auto' : ''}`}>
           {subtitle}
         </p>
       )}

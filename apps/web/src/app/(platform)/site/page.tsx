@@ -10,7 +10,7 @@ const SERVICES = [
   {
     name: 'Content Creation',
     desc: 'Boost your brand with captivating content! DGTL offers tailored content creation services designed to engage, inspire, and drive action. From blogs and social media posts to eye-catching visuals, we craft content that amplifies your voice and impact.',
-    icon: '\u26A1',
+    icon: '\u{1F4F7}',
     image: '/images/services/content-creation.jpg',
   },
   {
@@ -43,10 +43,43 @@ const SERVICES = [
     icon: '\u{1F3A8}',
     image: '/images/services/graphics-design.jpg',
   },
+  {
+    name: 'Advertising',
+    desc: 'Maximize your ROI with strategic paid advertising campaigns. From Google Ads to social media ads, we create targeted campaigns that reach the right audience, drive conversions, and scale your growth.',
+    icon: '\u{1F4CA}',
+    image: '/images/services/advertising.jpg',
+  },
+]
+
+const PORTFOLIO_CATEGORIES = ['All', 'Content Creation', 'Social Media', 'Influencer', 'Web Design & Dev', 'Graphics Design', 'Advertising']
+
+const PORTFOLIO_PROJECTS = [
+  {
+    title: 'Art Villas Costa Rica',
+    slug: 'art-villas-costa-rica',
+    desc: 'Content creation campaign — photography, videography, and user generated content.',
+    tags: ['Photography', 'Videography', 'UGC'],
+    categories: ['Content Creation'],
+  },
+  {
+    title: 'Six Senses Ibiza',
+    slug: 'six-senses-ibiza',
+    desc: 'Captivating digital presence reflecting luxury, wellness, and Mediterranean setting.',
+    tags: ['Photography', 'Videography', 'FPV Drone', 'Influencer'],
+    categories: ['Content Creation', 'Influencer'],
+  },
+  {
+    title: 'Pacific High Indonesia',
+    slug: 'pacific-high-dewata',
+    desc: 'Launch content campaign — aerial, land, and underwater in Raja Ampat.',
+    tags: ['Photography', 'Videography', 'Drone', 'Underwater'],
+    categories: ['Content Creation'],
+  },
 ]
 
 export default function SiteHome() {
   const [activeService, setActiveService] = useState(0)
+  const [activeCategory, setActiveCategory] = useState('All')
 
   return (
     <>
@@ -160,7 +193,7 @@ export default function SiteHome() {
       </Section>
 
       {/* ── Trusted By ────────────────────────────────────────────────────── */}
-      <Section id="trusted-by" className="!bg-transparent !pt-40 !pb-20">
+      <Section id="trusted-by" className="!bg-transparent !pt-20 !pb-20">
         <p className="text-center text-body-sm text-muted uppercase tracking-[0.15em] mb-24">
           Trusted by industry leaders and innovators worldwide
         </p>
@@ -217,16 +250,16 @@ export default function SiteHome() {
                     {SERVICES[activeService].desc}
                   </p>
                   <div className="mt-4">
-                    <Button variant="ghost" href="/services" className="!p-0 !text-white">
-                      <ButtonArrow />
-                    </Button>
+                    <a href="/services" className="inline-flex items-center gap-2 text-body-sm text-white font-medium transition-colors duration-200 hover:text-gold group/link">
+                      Learn More <span className="inline-block transition-transform duration-200 group-hover/link:translate-x-1"><ButtonArrow /></span>
+                    </a>
                   </div>
                 </motion.div>
               </AnimatePresence>
             </div>
 
             {/* Right — Service menu */}
-            <div className="flex flex-col gap-3 lg:justify-center">
+            <div className="flex flex-col gap-5 lg:justify-center">
               {SERVICES.map((service, i) => (
                 <button
                   key={service.name}
@@ -257,53 +290,61 @@ export default function SiteHome() {
             Our Featured Projects
           </SectionHeading>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                title: 'Art Villas Costa Rica',
-                slug: 'art-villas-costa-rica',
-                desc: 'Content creation campaign — photography, videography, and user generated content.',
-                tags: ['Photography', 'Videography', 'UGC'],
-              },
-              {
-                title: 'Six Senses Ibiza',
-                slug: 'six-senses-ibiza',
-                desc: 'Captivating digital presence reflecting luxury, wellness, and Mediterranean setting.',
-                tags: ['Photography', 'Videography', 'FPV Drone', 'Influencer'],
-              },
-              {
-                title: 'Pacific High Indonesia',
-                slug: 'pacific-high-dewata',
-                desc: 'Launch content campaign — aerial, land, and underwater in Raja Ampat.',
-                tags: ['Photography', 'Videography', 'Drone', 'Underwater'],
-              },
-            ].map(({ title, slug, desc, tags }) => (
-              <a
-                key={slug}
-                href={`/work/${slug}`}
-                className="group block overflow-hidden rounded-[var(--radius-md)] border border-line bg-surface-2 transition-all hover:border-gold-border hover:shadow-[var(--shadow-card)]"
+          {/* Category filter */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            {PORTFOLIO_CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setActiveCategory(cat)}
+                className={`px-5 py-2 rounded-full text-body-sm font-medium transition-colors duration-200 cursor-pointer border ${
+                  cat === activeCategory
+                    ? 'bg-white text-black border-white'
+                    : 'bg-transparent text-muted border-line hover:border-white/70 hover:text-white hover:bg-white/10'
+                }`}
               >
-                <div className="aspect-[16/10] bg-surface-3" />
-                <div className="p-5">
-                  <h3 className="text-card-title font-bold text-white tracking-[-0.02em] group-hover:text-gold">
-                    {title}
-                  </h3>
-                  <p className="mt-2 text-body-sm text-stone">
-                    {desc}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-micro text-gold bg-gold-pale px-2 py-0.5 rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </a>
+                {cat}
+              </button>
             ))}
+          </div>
+
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <AnimatePresence mode="popLayout">
+              {PORTFOLIO_PROJECTS
+                .filter((p) => activeCategory === 'All' || p.categories.includes(activeCategory))
+                .map(({ title, slug, desc, tags }) => (
+                  <motion.a
+                    key={slug}
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.25 }}
+                    href={`/work/${slug}`}
+                    className="group block overflow-hidden rounded-[var(--radius-md)] border border-line bg-surface-2 transition-all hover:border-gold-border hover:shadow-[var(--shadow-card)]"
+                  >
+                    <div className="aspect-[16/10] bg-surface-3" />
+                    <div className="p-5">
+                      <h3 className="text-card-title font-bold text-white tracking-[-0.02em] group-hover:text-gold">
+                        {title}
+                      </h3>
+                      <p className="mt-2 text-body-sm text-stone">
+                        {desc}
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="text-micro text-gold bg-gold-pale px-2 py-0.5 rounded-full"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.a>
+                ))}
+            </AnimatePresence>
           </div>
         </Container>
       </Section>
@@ -323,37 +364,20 @@ export default function SiteHome() {
                 committed to delivering exceptional results through creativity,
                 technology, and data-driven insights.
               </p>
-              <div className="mt-8">
-                <Button href="/about">
-                  Learn More <ButtonArrow />
-                </Button>
-              </div>
             </div>
-            {/* Image placeholder */}
-            <div className="aspect-[4/3] rounded-[var(--radius-lg)] bg-surface-2 border border-line" />
-          </div>
-        </Container>
-      </Section>
-
-
-      {/* ── Join the Team ─────────────────────────────────────────────────── */}
-      <Section className="!bg-transparent">
-        <Container>
-          <div className="text-center">
-            <h2 className="text-heading-1 font-bold text-white tracking-[-0.02em]">
-              Join DGTL Team &#9889;
-            </h2>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-              <Button href="/careers">
-                Join The DGTL Team <ButtonArrow />
-              </Button>
-              <Button variant="secondary" href="/creators">
-                Join DGTL Influence
-              </Button>
+            <div className="aspect-[4/3] rounded-[var(--radius-lg)] border border-line overflow-hidden relative">
+              <Image
+                src="/images/about-team.jpg"
+                alt="DGTL team collaborating"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
             </div>
           </div>
         </Container>
       </Section>
+
 
       {/* ── Testimonials ──────────────────────────────────────────────────── */}
       <Section className="!bg-transparent">
@@ -390,6 +414,49 @@ export default function SiteHome() {
                 </div>
               </div>
             ))}
+          </div>
+        </Container>
+      </Section>
+
+      {/* ── Join the Team ─────────────────────────────────────────────────── */}
+      <Section className="!bg-transparent">
+        <Container>
+          <h2 className="text-heading-1 font-bold text-white tracking-[-0.02em] text-center mb-12">
+            Join DGTL Team <Image src="/logos/spark.svg" alt="DGTL Spark" width={32} height={32} className="inline-block ml-2 -mt-1" />
+          </h2>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Join the Team card */}
+            <a
+              href="/careers"
+              className="group rounded-[var(--radius-md)] border border-line bg-surface-2 p-8 transition-all hover:border-gold-border hover:shadow-[var(--shadow-card)]"
+            >
+              <h3 className="text-heading-2 font-bold text-white tracking-[-0.02em] group-hover:text-gold">
+                Join The DGTL Team
+              </h3>
+              <p className="mt-4 text-body text-stone leading-relaxed">
+                Ready to shape the future of digital marketing? We&apos;re always on the lookout for innovative thinkers, creators, and strategists who thrive on challenges. Explore our available roles and become part of a dynamic team that&apos;s redefining the digital landscape.
+              </p>
+              <div className="mt-6 inline-flex items-center gap-2 text-body-sm text-white font-medium group-hover:text-gold transition-colors duration-200">
+                Explore Careers <span className="inline-block transition-transform duration-200 group-hover:translate-x-1"><ButtonArrow /></span>
+              </div>
+            </a>
+
+            {/* Join DGTL Influence card */}
+            <a
+              href="/creators"
+              className="group rounded-[var(--radius-md)] border border-line bg-surface-2 p-8 transition-all hover:border-gold-border hover:shadow-[var(--shadow-card)]"
+            >
+              <h3 className="text-heading-2 font-bold text-white tracking-[-0.02em] group-hover:text-gold">
+                Join DGTL Influence
+              </h3>
+              <p className="mt-4 text-body text-stone leading-relaxed">
+                Are you an influencer ready to grow your personal brand and collaborate with top-tier companies? DGTL Influence is looking for creative, passionate voices to join our network. Apply today and unlock exciting partnership opportunities!
+              </p>
+              <div className="mt-6 inline-flex items-center gap-2 text-body-sm text-white font-medium group-hover:text-gold transition-colors duration-200">
+                Apply Now <span className="inline-block transition-transform duration-200 group-hover:translate-x-1"><ButtonArrow /></span>
+              </div>
+            </a>
           </div>
         </Container>
       </Section>
