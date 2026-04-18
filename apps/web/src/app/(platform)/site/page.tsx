@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Button, ButtonArrow, SectionHeading, Container, Section } from '@/components'
 import { LogoCarousel } from '@/components/ui/LogoCarousel'
+import { NewsletterForm } from '@/components/ui/NewsletterForm'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const SERVICES = [
@@ -448,26 +449,66 @@ export default function SiteHome() {
             Customer Testimonials
           </SectionHeading>
 
-          {/* Testimonial cards — Payload CMS Phase 03 */}
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
+            {[
+              {
+                logo: '/logos/clients/epidemic-sound.webp',
+                logoAlt: 'Epidemic Sound',
+                quote: 'Guys!!! WOW! This is awesome \u{1F929} I love it \u2764\uFE0F So happy to see the results!',
+                name: 'Jelena Ljubinkovic',
+                title: 'Social Media Channel Manager',
+                company: 'Epidemic Sound',
+                avatar: '/images/testimonials/jelena.webp',
+              },
+              {
+                logo: '/logos/clients/art-villas.webp',
+                logoAlt: 'Art Villas Costa Rica',
+                quote: "It\u2019s rare to find such young and passionate professionals. I am privileged to work with them, get to know them, and now call them friends. Their creativity, work ethic, skills and drive are exceptional. Just look at what they did for Art Villas in only 5 shooting days!",
+                name: 'Filip \u017D\u00E1k',
+                title: 'Founder',
+                company: 'Art Villas Costa Rica',
+                avatar: '/images/testimonials/filip.png',
+              },
+              {
+                logo: null,
+                logoAlt: 'Pacific High Indonesia',
+                quote: "The attention to detail and the quality of content produced surpassed all our expectations. DGTL\u2019s team truly understands how to capture the essence of a brand through visual storytelling.",
+                name: 'Pacific High Team',
+                title: '',
+                company: 'Pacific High Indonesia',
+                avatar: null,
+              },
+            ].map((t) => (
               <div
-                key={i}
-                className="rounded-[var(--radius-md)] border border-line bg-surface-2 p-6"
+                key={t.name}
+                className="rounded-[var(--radius-md)] border border-line bg-surface-2 p-6 flex flex-col"
               >
-                <div className="flex items-center gap-1 mb-4">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <span key={s} className="text-gold">&#9733;</span>
-                  ))}
+                {/* Logo */}
+                <div className="mb-5 h-8 flex items-center">
+                  {t.logo ? (
+                    <Image src={t.logo} alt={t.logoAlt} width={160} height={44} className="h-8 w-auto object-contain brightness-0 invert opacity-90" />
+                  ) : (
+                    <span className="text-body-sm font-bold text-white/70">{t.logoAlt}</span>
+                  )}
                 </div>
-                <p className="text-body-sm text-stone italic">
-                  &ldquo;Testimonial placeholder — will be populated from Payload CMS.&rdquo;
+
+                {/* Quote */}
+                <p className="text-body text-white/90 leading-relaxed flex-1">
+                  &ldquo;{t.quote}&rdquo;
                 </p>
-                <div className="mt-4 flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-surface-3" />
+
+                {/* Author */}
+                <div className="mt-5 flex items-center gap-3 pt-5 border-t border-line">
+                  {t.avatar ? (
+                    <Image src={t.avatar} alt={t.name} width={40} height={40} className="h-10 w-10 rounded-full object-cover" />
+                  ) : (
+                    <div className="h-10 w-10 rounded-full bg-surface-3 flex items-center justify-center text-body-sm text-muted font-bold">
+                      {t.name.charAt(0)}
+                    </div>
+                  )}
                   <div>
-                    <p className="text-body-sm font-bold text-white">Client Name</p>
-                    <p className="text-caption text-muted">Company</p>
+                    <p className="text-body-sm font-bold text-white">{t.name}</p>
+                    <p className="text-caption text-muted">{t.title}{t.title && ' — '}{t.company}</p>
                   </div>
                 </div>
               </div>
@@ -540,15 +581,8 @@ export default function SiteHome() {
             Stay updated with the latest insights and trends in digital
             marketing. Subscribe to our newsletter!
           </p>
-          <div className="mt-8 flex items-center justify-center gap-3 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 rounded-[var(--radius)] border border-line bg-surface-2 px-4 py-3 text-body text-white placeholder:text-muted outline-none focus:border-gold"
-            />
-            <Button href="#">
-              Get Started
-            </Button>
+          <div className="mt-8">
+            <NewsletterForm />
           </div>
         </Container>
       </Section>

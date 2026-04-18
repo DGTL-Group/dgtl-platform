@@ -202,6 +202,18 @@ a:not(.btn):hover {
   to { transform: translateX(-50%); }
 }
 
+@keyframes lightning-flicker {
+  0%   { opacity: 1; color: white; }
+  10%  { opacity: 0.2; color: white; }
+  20%  { opacity: 1; color: #F0CF50; }
+  30%  { opacity: 0.3; color: white; }
+  45%  { opacity: 1; color: #F0CF50; }
+  55%  { opacity: 0.15; color: white; }
+  70%  { opacity: 1; color: #F0CF50; }
+  85%  { opacity: 0.4; color: #F0CF50; }
+  100% { opacity: 0; color: #F0CF50; }
+}
+
 @keyframes tw-blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }

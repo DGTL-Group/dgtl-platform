@@ -2,6 +2,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { LineGlow } from '@/components/ui/LineGlow'
 import { CursorGlow } from '@/components/ui/CursorGlow'
+import { AmbientGlow } from '@/components/ui/AmbientGlow'
 
 export default function SiteLayout({
   children,
@@ -12,6 +13,7 @@ export default function SiteLayout({
     <>
       <LineGlow />
       <CursorGlow />
+      <AmbientGlow />
       <Navbar />
       <main className="flex-1 pt-[72px]">{children}</main>
       <Footer />
