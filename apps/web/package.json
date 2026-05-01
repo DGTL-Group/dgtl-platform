@@ -10,7 +10,9 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "generate:types": "payload generate:types",
-    "generate:importmap": "payload generate:importmap"
+    "generate:importmap": "payload generate:importmap",
+    "email:dev": "email dev --dir src/emails --port 3030",
+    "email:render": "node --import @swc-node/register/esm-register scripts/render-emails.ts"
   },
   "dependencies": {
     "@eslint/eslintrc": "^3.0.0",
@@ -19,6 +21,8 @@
     "@payloadcms/richtext-lexical": "^3.81.0",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@react-email/components": "^1.0.12",
+    "@react-email/render": "^2.0.8",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^20.0.0",
     "@types/react": "^19.0.0",
@@ -28,15 +32,18 @@
     "framer-motion": "^12.38.0",
     "graphql": "^16.13.2",
     "next": "~16.2.0",
+    "nodemailer": "^8.0.7",
     "payload": "^3.81.0",
     "payload-storage-cloudinary": "^1.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-email": "^6.0.5",
     "sharp": "^0.34.5",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.0.0"
   },
   "devDependencies": {
-    "@swc-node/register": "^1.11.1"
+    "@swc-node/register": "^1.11.1",
+    "@types/nodemailer": "^8.0.0"
   }
 }

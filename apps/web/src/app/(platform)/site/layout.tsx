@@ -12,8 +12,8 @@ export default function SiteLayout({
   return (
     <>
       <LineGlow />
-      <CursorGlow />
       <AmbientGlow />
+      <CursorGlow />
       <Navbar />
       <main className="flex-1 pt-[72px]">{children}</main>
       <Footer />

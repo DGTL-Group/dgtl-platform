@@ -25,6 +25,10 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
       max: process.env.NEXT_PHASE === 'phase-production-build' ? 3 : 10,
+      // dgtl-postgres on the VPS uses a self-signed cert. We require SSL
+      // (encryption) but don't verify the issuer chain. If a real CA cert
+      // gets installed later, change this to `{ ca: fs.readFileSync(...) }`.
+      ssl: { rejectUnauthorized: false },
     },
   }),
   editor: lexicalEditor(),

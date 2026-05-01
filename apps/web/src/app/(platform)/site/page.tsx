@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Button, ButtonArrow, SectionHeading, Container, Section } from '@/components'
 import { LogoCarousel } from '@/components/ui/LogoCarousel'
 import { NewsletterForm } from '@/components/ui/NewsletterForm'
+import { ContactForm } from '@/components/ui/ContactForm'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const SERVICES = [
@@ -270,6 +271,9 @@ export default function SiteHome() {
           <div className="grid gap-10 lg:grid-cols-[2fr_3fr] lg:items-center">
             {/* Left — Image + detail card */}
             <div className="relative">
+              {/* Image rendered as CSS background-image — backdrop-filter on
+                  the overlay card reliably blurs CSS backgrounds across
+                  framer-motion stacking contexts. */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={`img-${activeService}`}
@@ -277,16 +281,11 @@ export default function SiteHome() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="aspect-[3/4] rounded-[var(--radius-lg)] border border-line overflow-hidden relative"
-                >
-                  <Image
-                    src={SERVICES[activeService].image}
-                    alt={SERVICES[activeService].name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
-                </motion.div>
+                  role="img"
+                  aria-label={SERVICES[activeService].name}
+                  className="aspect-[3/4] rounded-[var(--radius-lg)] border border-line overflow-hidden relative bg-cover bg-center"
+                  style={{ backgroundImage: `url(${SERVICES[activeService].image})` }}
+                />
               </AnimatePresence>
 
               {/* Overlay card */}
@@ -297,7 +296,7 @@ export default function SiteHome() {
                   animate={{ opacity: 1, y: '50%' }}
                   exit={{ opacity: 0, y: 'calc(50% - 20px)' }}
                   transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-                  className="absolute bottom-0 left-0 right-0 sm:left-auto sm:right-4 sm:max-w-sm rounded-[var(--radius-md)] border border-line bg-surface-2/90 backdrop-blur-md p-5"
+                  className="absolute bottom-0 left-0 right-0 sm:left-auto sm:right-4 sm:max-w-sm rounded-[var(--radius-md)] border border-line card-glass p-5"
                 >
                   <div className="mb-3 h-10 w-10 rounded-[var(--radius)] bg-gold-pale flex items-center justify-center">
                     <span className="text-gold text-lg">{SERVICES[activeService].icon}</span>
@@ -380,9 +379,9 @@ export default function SiteHome() {
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.25 }}
                     href={`/work/${slug}`}
-                    className="group block overflow-hidden rounded-[var(--radius-md)] border border-line bg-surface-2 transition-all hover:border-gold-border hover:shadow-[var(--shadow-card)]"
+                    className="group block overflow-hidden rounded-[var(--radius-md)] border border-line card-glass transition-all hover:border-gold-border hover:shadow-[var(--shadow-card)]"
                   >
-                    <div className="aspect-[16/10] bg-surface-3" />
+                    <div className="aspect-[4/5] bg-surface-3" />
                     <div className="p-5">
                       <h3 className="text-card-title font-bold text-white tracking-[-0.02em] group-hover:text-gold">
                         {title}
@@ -481,7 +480,7 @@ export default function SiteHome() {
             ].map((t) => (
               <div
                 key={t.name}
-                className="rounded-[var(--radius-md)] border border-line bg-surface-2 p-6 flex flex-col"
+                className="rounded-[var(--radius-md)] border border-line card-glass p-6 flex flex-col"
               >
                 {/* Logo */}
                 <div className="mb-5 h-8 flex items-center">
@@ -528,7 +527,7 @@ export default function SiteHome() {
             {/* Join the Team card */}
             <a
               href="/careers"
-              className="group rounded-[var(--radius-md)] border border-line bg-surface-2 p-8 transition-all hover:border-gold-border hover:shadow-[var(--shadow-card)]"
+              className="group rounded-[var(--radius-md)] border border-line card-glass p-8 transition-all hover:border-gold-border hover:shadow-[var(--shadow-card)]"
             >
               <h3 className="text-heading-2 font-bold text-white tracking-[-0.02em] group-hover:text-gold">
                 Join The DGTL Team
@@ -544,7 +543,7 @@ export default function SiteHome() {
             {/* Join DGTL Influence card */}
             <a
               href="/creators"
-              className="group rounded-[var(--radius-md)] border border-line bg-surface-2 p-8 transition-all hover:border-gold-border hover:shadow-[var(--shadow-card)]"
+              className="group rounded-[var(--radius-md)] border border-line card-glass p-8 transition-all hover:border-gold-border hover:shadow-[var(--shadow-card)]"
             >
               <h3 className="text-heading-2 font-bold text-white tracking-[-0.02em] group-hover:text-gold">
                 Join DGTL Influence
@@ -561,7 +560,7 @@ export default function SiteHome() {
       </Section>
 
       {/* ── Brand Statement — Typewriter ────────────────────────────────── */}
-      <Section className="!bg-transparent">
+      <Section spacing="sm" className="!bg-transparent">
         <Container className="text-center">
           <h2 className="text-[36px] sm:text-[70px] font-extrabold text-white tracking-[-1.4px] leading-[1.1] mx-auto">
             Branding, websites and digital experiences, crafted with
@@ -572,9 +571,9 @@ export default function SiteHome() {
       </Section>
 
       {/* ── Newsletter ────────────────────────────────────────────────────── */}
-      <Section className="!bg-transparent">
+      <Section spacing="sm" className="!bg-transparent">
         <Container size="narrow" className="text-center">
-          <h2 className="text-heading-2 font-bold text-white tracking-[-0.02em]">
+          <h2 className="text-heading-1 font-bold text-white tracking-[-0.02em]">
             Join Our Thriving Community
           </h2>
           <p className="mt-4 text-body-lg text-muted">
@@ -587,21 +586,21 @@ export default function SiteHome() {
         </Container>
       </Section>
 
-      {/* ── Contact CTA ───────────────────────────────────────────────────── */}
-      <Section className="!bg-transparent text-center">
-        <Container size="narrow">
-          <h2 className="text-heading-1 font-bold text-white tracking-[-0.02em]">
-            Get in Touch
-          </h2>
-          <p className="mt-4 text-body-lg text-muted">
-            Ready to elevate your brand? We&apos;re here to help! Whether you
-            have questions or want to discuss your next project, our marketing
-            experts are just a message away.
-          </p>
-          <div className="mt-8">
-            <Button href="/contact">
-              Contact Us <ButtonArrow />
-            </Button>
+      {/* ── Get in Touch — Contact form ──────────────────────────────────── */}
+      <Section spacing="sm" className="!bg-transparent">
+        <Container>
+          <div className="text-center mb-10">
+            <h2 className="text-heading-1 font-bold text-white tracking-[-0.02em]">
+              Get in Touch
+            </h2>
+            <p className="mt-4 text-body-lg text-muted max-w-2xl mx-auto">
+              Ready to elevate your brand? We&apos;re here to help! Whether you
+              have questions or want to discuss your next project, our marketing
+              experts are just a message away. Get in touch today!
+            </p>
+          </div>
+          <div className="max-w-3xl mx-auto">
+            <ContactForm />
           </div>
         </Container>
       </Section>

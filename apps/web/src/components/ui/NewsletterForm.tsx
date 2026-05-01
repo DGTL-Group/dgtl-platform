@@ -65,7 +65,7 @@ export function NewsletterForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           disabled={isDisabled}
-          className="flex-1 rounded-[var(--radius)] border border-line bg-surface-2 px-4 py-3 text-body text-white placeholder:text-muted outline-none focus:border-gold disabled:opacity-60 transition-opacity duration-300"
+          className="flex-1 rounded-[var(--radius)] border border-line card-glass px-4 py-3 text-body text-white placeholder:text-muted outline-none focus:border-gold disabled:opacity-60 transition-opacity duration-300"
         />
         <button
           type="submit"

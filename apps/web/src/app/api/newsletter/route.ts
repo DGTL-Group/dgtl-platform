@@ -1,6 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const BASE_URL = 'https://app.sendmails.io/api/v1'
+/**
+ * Newsletter subscription endpoint backed by Mautic.
+ *
+ * Flow:
+ *  1. Look up contact by email.
+ *  2. If contact exists and is already in the newsletter segment → "already subscribed".
+ *  3. If contact exists but isn't in the segment → add them, "welcome back".
+ *  4. If contact doesn't exist → create + add to segment, "welcome".
+ */
+
+interface MauticContact {
+  id: number
+  fields?: Record<string, unknown>
+}
+
+interface MauticListEntry {
+  id: number
+  name?: string
+}
+
+function authHeader() {
+  const user = process.env.MAUTIC_API_USERNAME
+  const pass = process.env.MAUTIC_API_PASSWORD
+  if (!user || !pass) return null
+  return 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64')
+}
+
+async function mauticFetch(path: string, init: RequestInit = {}) {
+  const baseUrl = process.env.MAUTIC_BASE_URL
+  if (!baseUrl) throw new Error('MAUTIC_BASE_URL not set')
+  const auth = authHeader()
+  if (!auth) throw new Error('MAUTIC_API_USERNAME or MAUTIC_API_PASSWORD not set')
+
+  const res = await fetch(`${baseUrl}/api${path}`, {
+    ...init,
+    headers: {
+      Authorization: auth,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      ...(init.headers || {}),
+    },
+  })
+
+  return res
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,82 +54,105 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Valid email is required.' }, { status: 400 })
     }
 
-    const apiToken = process.env.SENDMAILS_API_TOKEN
-    const listUid = process.env.SENDMAILS_LIST_UID
-
-    if (!apiToken || !listUid) {
-      console.error('Missing SENDMAILS_API_TOKEN or SENDMAILS_LIST_UID env vars')
+    const segmentId = process.env.MAUTIC_NEWSLETTER_SEGMENT_ID
+    if (!segmentId) {
+      console.error('Missing MAUTIC_NEWSLETTER_SEGMENT_ID env var')
       return NextResponse.json({ error: 'Newsletter service not configured.' }, { status: 500 })
     }
 
-    // 1. Check if subscriber already exists
-    const findRes = await fetch(
-      `${BASE_URL}/subscribers/email/${encodeURIComponent(email)}?api_token=${apiToken}&list_uid=${listUid}`,
-      { method: 'GET', headers: { Accept: 'application/json' } },
+    // 1. Search for existing contact by email
+    const searchRes = await mauticFetch(
+      `/contacts?search=${encodeURIComponent(`email:${email}`)}&limit=1`,
     )
+    if (!searchRes.ok) {
+      console.error('Mautic search failed', searchRes.status, await searchRes.text())
+      return NextResponse.json(
+        { error: 'Could not reach the newsletter service. Please try again later.' },
+        { status: 500 },
+      )
+    }
+    const searchData = (await searchRes.json()) as { contacts?: Record<string, MauticContact> }
+    const existing = searchData.contacts ? Object.values(searchData.contacts)[0] : undefined
 
-    if (findRes.ok) {
-      const findData = await findRes.json()
-      const allMatches = findData.subscribers ?? (findData.subscriber ? [findData.subscriber] : [])
-      const subscriber = allMatches.find((s: { list_uid: string }) => s.list_uid === listUid)
+    if (existing) {
+      // 2. Check if they're already in the newsletter segment
+      const segRes = await mauticFetch(`/contacts/${existing.id}/segments`)
+      if (segRes.ok) {
+        const segData = (await segRes.json()) as { lists?: Record<string, MauticListEntry> }
+        const inSegment = segData.lists
+          ? Object.values(segData.lists).some((l) => String(l.id) === String(segmentId))
+          : false
 
-      if (subscriber) {
-        // Already actively subscribed
-        if (subscriber.status === 'subscribed') {
+        if (inSegment) {
           return NextResponse.json({
             success: false,
             alreadySubscribed: true,
             message: "You're already subscribed to our newsletter.",
           })
         }
-
-        // Previously unsubscribed — resubscribe them
-        if (subscriber.status === 'unsubscribed') {
-          const resubRes = await fetch(
-            `${BASE_URL}/lists/${listUid}/subscribers/${subscriber.id}/subscribe?api_token=${apiToken}`,
-            { method: 'PATCH', headers: { Accept: 'application/json' } },
-          )
-
-          if (resubRes.ok) {
-            return NextResponse.json({
-              success: true,
-              message: 'Welcome back! You are subscribed again.',
-            })
-          }
-
-          return NextResponse.json({
-            success: false,
-            message: 'Could not resubscribe. Please try again later.',
-          })
-        }
       }
-    }
 
-    // 2. New subscriber — create
-    const createRes = await fetch(`${BASE_URL}/subscribers?api_token=${apiToken}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({
-        list_uid: listUid,
-        EMAIL: email,
-        status: 'subscribed',
-      }),
-    })
+      // 3. Contact exists but isn't in the segment yet — add them
+      const addRes = await mauticFetch(
+        `/segments/${segmentId}/contact/${existing.id}/add`,
+        { method: 'POST' },
+      )
+      if (!addRes.ok) {
+        console.error('Mautic add-to-segment failed', addRes.status, await addRes.text())
+        return NextResponse.json({
+          success: false,
+          message: 'Could not subscribe. Please try again later.',
+        })
+      }
 
-    const createData = await createRes.json()
-
-    if (createData.status === 1) {
       return NextResponse.json({
         success: true,
-        message: 'Welcome to the DGTL newsletter!',
+        message: 'Welcome back to the DGTL newsletter!',
+      })
+    }
+
+    // 4. New contact — create then add to segment
+    const createRes = await mauticFetch('/contacts/new', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    })
+    if (!createRes.ok) {
+      console.error('Mautic create-contact failed', createRes.status, await createRes.text())
+      return NextResponse.json({
+        success: false,
+        message: 'Could not subscribe. Please try again later.',
+      })
+    }
+    const createData = (await createRes.json()) as { contact?: MauticContact }
+    const newId = createData.contact?.id
+    if (!newId) {
+      return NextResponse.json({
+        success: false,
+        message: 'Could not subscribe. Please try again later.',
+      })
+    }
+
+    const addRes = await mauticFetch(`/segments/${segmentId}/contact/${newId}/add`, {
+      method: 'POST',
+    })
+    if (!addRes.ok) {
+      console.error('Mautic add-to-segment (new) failed', addRes.status, await addRes.text())
+      // Contact was created but we couldn't add to segment — still report partial success
+      return NextResponse.json({
+        success: false,
+        message: 'Subscription is processing. Please try again in a moment.',
       })
     }
 
     return NextResponse.json({
-      success: false,
-      message: createData.message || 'Could not subscribe. Please try again later.',
+      success: true,
+      message: 'Welcome to the DGTL newsletter!',
     })
-  } catch {
-    return NextResponse.json({ error: 'Something went wrong. Please try again later.' }, { status: 500 })
+  } catch (err) {
+    console.error('Newsletter route error:', err)
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again later.' },
+      { status: 500 },
+    )
   }
 }
